@@ -1,0 +1,315 @@
+<!DOCTYPE HTML>
+<!--
+	Hyperspace by HTML5 UP
+	html5up.net | @ajlkn
+	Free for personal and commercial use under the CCA 3.0 license (html5up.net/license)
+-->
+<html>
+	<head>
+		<title>Forex Alkalmazás</title>
+		<meta charset="utf-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no" />
+		<link rel="stylesheet" href="assets/css/main.css" />
+		<noscript><link rel="stylesheet" href="assets/css/noscript.css" /></noscript>
+		<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+	</head>
+	<body class="is-preload">
+
+		<!-- Sidebar -->
+			<section id="sidebar">
+				<div class="inner">
+					<nav>
+						<ul>
+							<li><a href="#intro">Kezdőoldal</a></li>
+							<li><a href="#soap">SOAP</a></li>
+							<li><a href="#account">Forex-Account</a></li>
+							<li><a href="#aktár">Forex-AktÁr</a></li>
+							<li><a href="#histár">Forex-HistÁr</a></li>
+							<li><a href="#nyit">Forex-Nyit</a></li>
+							<li><a href="#poz">Forex-Poz</a></li>
+							<li><a href="#zár">Forex-Zár</a></li>
+						</ul>
+					</nav>
+				</div>
+			</section>
+
+		<!-- Wrapper -->
+			<div id="wrapper">
+
+				<!-- Intro -->
+					<section id="intro" class="wrapper style1 fullscreen fade-up">
+						<div class="inner">
+							<h1>Forex Kereskedési Platform</h1>
+							<p>Professzionális forex kereskedési és elemzési platform magyar devizaárfolyam-adatokkal</p>
+							<ul class="actions">
+								<li><a href="#soap" class="button scrolly">Kezdjük</a></li>
+							</ul>
+						</div>
+					</section>
+
+				<!-- SOAP Section -->
+					<section id="soap" class="wrapper style2 fade-up">
+						<div class="inner">
+							<h2>MNB Árfolyamadatok (SOAP)</h2>
+							<p>A Magyar Nemzeti Bank webszolgáltatásából letölthető devizaárfolyam-adatok</p>
+
+							<div class="soap-form" style="background: rgba(212, 212, 212, 0.1); padding: 2em; border-radius: 8px; margin: 2em 0;">
+								<div class="fields">
+									<div class="field">
+										<label for="currency">Deviza választása</label>
+										<select id="currency" name="currency" required>
+											<option value="">-- Válassz devizát --</option>
+											<option value="EUR">EUR (Euro)</option>
+											<option value="USD">USD (Amerikai Dollár)</option>
+											<option value="GBP">GBP (Brit Font)</option>
+											<option value="JPY">JPY (Japán Jen)</option>
+											<option value="CHF">CHF (Svájci Frank)</option>
+											<option value="AUD">AUD (Ausztrál Dollár)</option>
+											<option value="CAD">CAD (Kanadai Dollár)</option>
+											<option value="CZK">CZK (Cseh Korona)</option>
+											<option value="DKK">DKK (Dán Korona)</option>
+											<option value="HUF">HUF (Magyar Forint)</option>
+											<option value="NOK">NOK (Norvég Korona)</option>
+											<option value="PLN">PLN (Lengyel Zloty)</option>
+											<option value="RON">RON (Román Lej)</option>
+											<option value="SEK">SEK (Svéd Korona)</option>
+											<option value="HRK">HRK (Horvát Kuna)</option>
+										</select>
+									</div>
+									<div class="field half">
+										<label for="dateFrom">Kezdő dátum</label>
+										<input type="date" id="dateFrom" name="dateFrom" required />
+									</div>
+									<div class="field half">
+										<label for="dateTo">Befejező dátum</label>
+										<input type="date" id="dateTo" name="dateTo" required />
+									</div>
+								</div>
+								<ul class="actions">
+									<li><button class="button" onclick="fetchExchangeRates()">Adatok lekérése</button></li>
+								</ul>
+							</div>
+
+							<!-- Eredmények -->
+							<div id="soap-results" style="display: none;">
+								<h3>Árfolyamadatok</h3>
+								<div style="overflow-x: auto; margin: 1em 0;">
+									<table style="width: 100%; border-collapse: collapse;">
+										<thead>
+											<tr style="background: rgba(0, 212, 255, 0.2);">
+												<th style="padding: 0.75em; text-align: left; border: 1px solid rgba(212, 212, 212, 0.3);">Dátum</th>
+												<th style="padding: 0.75em; text-align: left; border: 1px solid rgba(212, 212, 212, 0.3);">Árfolyam</th>
+											</tr>
+										</thead>
+										<tbody id="soap-table-body">
+										</tbody>
+									</table>
+								</div>
+
+								<!-- Chart -->
+								<div style="position: relative; height: 400px; margin: 2em 0;">
+									<canvas id="exchangeChart"></canvas>
+								</div>
+							</div>
+						</div>
+					</section>
+
+				<!-- Account Section -->
+					<section id="account" class="wrapper style1 fade-up">
+						<div class="inner">
+							<h2>Forex-Account</h2>
+							<p>Számlainformációk</p>
+
+							<div id="account-info" style="background: rgba(212, 212, 212, 0.1); padding: 2em; border-radius: 8px; margin: 2em 0;">
+								<p><strong>Felhasználó:</strong> demo_user</p>
+								<p><strong>Számlaszám:</strong> DEMO-2025-001</p>
+								<p><strong>Egyenleg:</strong> 10,000 USD</p>
+								<p><strong>Felhasznált margin:</strong> 2,500 USD</p>
+								<p><strong>Szabad margin:</strong> 7,500 USD</p>
+							</div>
+						</div>
+					</section>
+
+				<!-- AktÁr Section -->
+					<section id="aktár" class="wrapper style2 fade-up">
+						<div class="inner">
+							<h2>Forex-AktÁr (Aktuális Ár)</h2>
+							<p>Az instrumentum aktuális piaci ára</p>
+
+							<div style="background: rgba(212, 212, 212, 0.1); padding: 2em; border-radius: 8px; margin: 2em 0;">
+								<div class="field">
+									<label for="aktár-instrument">Instrumentum választása</label>
+									<select id="aktár-instrument">
+										<option value="">-- Válassz instrumentumot --</option>
+										<option value="EUR_USD">EUR/USD</option>
+										<option value="GBP_USD">GBP/USD</option>
+										<option value="USD_JPY">USD/JPY</option>
+										<option value="USD_CHF">USD/CHF</option>
+										<option value="AUD_USD">AUD/USD</option>
+										<option value="USD_CAD">USD/CAD</option>
+									</select>
+								</div>
+								<ul class="actions">
+									<li><button class="button" onclick="fetchCurrentPrice()">Ár lekérése</button></li>
+								</ul>
+								<div id="aktár-result" style="margin-top: 1em; display: none;">
+									<h3 id="aktár-title"></h3>
+									<p style="font-size: 1.5em; color: #00d4ff;"><strong id="aktár-price"></strong></p>
+								</div>
+							</div>
+						</div>
+					</section>
+
+				<!-- HistÁr Section -->
+					<section id="histár" class="wrapper style1 fade-up">
+						<div class="inner">
+							<h2>Forex-HistÁr (Historikus Ár)</h2>
+							<p>Az instrumentum historikus árfolyamadatai</p>
+
+							<div style="background: rgba(212, 212, 212, 0.1); padding: 2em; border-radius: 8px; margin: 2em 0;">
+								<div class="fields">
+									<div class="field half">
+										<label for="histár-instrument">Instrumentum</label>
+										<select id="histár-instrument">
+											<option value="">-- Válassz --</option>
+											<option value="EUR_USD">EUR/USD</option>
+											<option value="GBP_USD">GBP/USD</option>
+											<option value="USD_JPY">USD/JPY</option>
+										</select>
+									</div>
+									<div class="field half">
+										<label for="granularity">Granularitás</label>
+										<select id="granularity">
+											<option value="H1">H1 (Óra)</option>
+											<option value="D" selected>D (Napi)</option>
+											<option value="W">W (Heti)</option>
+											<option value="M">M (Havi)</option>
+										</select>
+									</div>
+								</div>
+								<ul class="actions">
+									<li><button class="button" onclick="fetchHistoricalPrice()">Historikus adatok</button></li>
+								</ul>
+								<div id="histár-result" style="margin-top: 1em; display: none; overflow-x: auto;">
+									<table style="width: 100%; border-collapse: collapse;">
+										<thead>
+											<tr style="background: rgba(0, 212, 255, 0.2);">
+												<th style="padding: 0.75em; border: 1px solid rgba(212, 212, 212, 0.3);">Idő</th>
+												<th style="padding: 0.75em; border: 1px solid rgba(212, 212, 212, 0.3);">Nyitás</th>
+												<th style="padding: 0.75em; border: 1px solid rgba(212, 212, 212, 0.3);">Legmagasabb</th>
+												<th style="padding: 0.75em; border: 1px solid rgba(212, 212, 212, 0.3);">Legalacsonyabb</th>
+												<th style="padding: 0.75em; border: 1px solid rgba(212, 212, 212, 0.3);">Záró</th>
+											</tr>
+										</thead>
+										<tbody id="histár-table-body">
+										</tbody>
+									</table>
+								</div>
+							</div>
+						</div>
+					</section>
+
+				<!-- Nyit Section -->
+					<section id="nyit" class="wrapper style2 fade-up">
+						<div class="inner">
+							<h2>Forex-Nyit (Pozíció Megnyitása)</h2>
+							<p>Új pozíció megnyitása piaci áron</p>
+
+							<div style="background: rgba(212, 212, 212, 0.1); padding: 2em; border-radius: 8px; margin: 2em 0;">
+								<div class="fields">
+									<div class="field">
+										<label for="nyit-instrument">Instrumentum</label>
+										<select id="nyit-instrument">
+											<option value="">-- Válassz --</option>
+											<option value="EUR_USD">EUR/USD</option>
+											<option value="GBP_USD">GBP/USD</option>
+											<option value="USD_JPY">USD/JPY</option>
+										</select>
+									</div>
+									<div class="field">
+										<label for="nyit-amount">Mennyiség (Long: +, Short: -)</label>
+										<input type="number" id="nyit-amount" placeholder="pl. 100000 vagy -100000" required />
+									</div>
+								</div>
+								<ul class="actions">
+									<li><button class="button" onclick="openPosition()">Pozíció megnyitása</button></li>
+								</ul>
+								<div id="nyit-result" style="margin-top: 1em; display: none; background: rgba(0, 212, 255, 0.1); padding: 1em; border-radius: 4px;">
+									<p id="nyit-message"></p>
+								</div>
+							</div>
+						</div>
+					</section>
+
+				<!-- Poz Section -->
+					<section id="poz" class="wrapper style1 fade-up">
+						<div class="inner">
+							<h2>Forex-Poz (Nyitott Pozíciók)</h2>
+							<p>Az összes nyitott pozícióm</p>
+
+							<div style="overflow-x: auto; margin: 2em 0;">
+								<table style="width: 100%; border-collapse: collapse;">
+									<thead>
+										<tr style="background: rgba(0, 212, 255, 0.2);">
+											<th style="padding: 0.75em; text-align: left; border: 1px solid rgba(212, 212, 212, 0.3);">Trade ID</th>
+											<th style="padding: 0.75em; text-align: left; border: 1px solid rgba(212, 212, 212, 0.3);">Instrumentum</th>
+											<th style="padding: 0.75em; text-align: left; border: 1px solid rgba(212, 212, 212, 0.3);">Típus</th>
+											<th style="padding: 0.75em; text-align: left; border: 1px solid rgba(212, 212, 212, 0.3);">Mennyiség</th>
+											<th style="padding: 0.75em; text-align: left; border: 1px solid rgba(212, 212, 212, 0.3);">Nyitási Ár</th>
+											<th style="padding: 0.75em; text-align: left; border: 1px solid rgba(212, 212, 212, 0.3);">Aktuális Ár</th>
+											<th style="padding: 0.75em; text-align: left; border: 1px solid rgba(212, 212, 212, 0.3);">P&L</th>
+										</tr>
+									</thead>
+									<tbody id="poz-table-body">
+										<tr style="border: 1px solid rgba(212, 212, 212, 0.3);">
+											<td colspan="7" style="padding: 1em; text-align: center; color: rgba(212, 212, 212, 0.5);">Nincsenek nyitott pozíciók</td>
+										</tr>
+									</tbody>
+								</table>
+							</div>
+						</div>
+					</section>
+
+				<!-- Zár Section -->
+					<section id="zár" class="wrapper style2 fade-up">
+						<div class="inner">
+							<h2>Forex-Zár (Pozíció Zárása)</h2>
+							<p>Nyitott pozíció zárása piaci áron</p>
+
+							<div style="background: rgba(212, 212, 212, 0.1); padding: 2em; border-radius: 8px; margin: 2em 0;">
+								<div class="field">
+									<label for="zár-tradeId">Trade ID</label>
+									<input type="number" id="zár-tradeId" placeholder="Adja meg a Trade ID-t" min="1" required />
+								</div>
+								<ul class="actions">
+									<li><button class="button" onclick="closePosition()">Pozíció zárása</button></li>
+								</ul>
+								<div id="zár-result" style="margin-top: 1em; display: none; background: rgba(0, 212, 255, 0.1); padding: 1em; border-radius: 4px;">
+									<p id="zár-message"></p>
+								</div>
+							</div>
+						</div>
+					</section>
+
+			</div>
+
+		<!-- Footer -->
+			<footer id="footer" class="wrapper style1-alt">
+				<div class="inner">
+					<ul class="menu">
+						<li>&copy; Forex Platform 2025. Minden jog fenntartva.</li>
+					</ul>
+				</div>
+			</footer>
+
+		<!-- Scripts -->
+			<script src="assets/js/jquery.min.js"></script>
+			<script src="assets/js/jquery.scrollex.min.js"></script>
+			<script src="assets/js/jquery.scrolly.min.js"></script>
+			<script src="assets/js/browser.min.js"></script>
+			<script src="assets/js/breakpoints.min.js"></script>
+			<script src="assets/js/util.js"></script>
+			<script src="assets/js/main.js"></script>
+			<script src="assets/js/app.js"></script>
+	</body>
+</html>

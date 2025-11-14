@@ -1,0 +1,354 @@
+<!DOCTYPE html>
+<html lang="hu" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <title>SOAP - MNB Árfolyamok</title>
+
+    <!-- Fonts and CSS -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css?family=Nunito:200,200i,300,300i,400,400i,600,600i,700,700i,800,800i,900,900i" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="/sb-admin-2/css/sb-admin-2.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+
+<body id="page-top">
+    <div id="wrapper">
+        <!-- Sidebar -->
+        <ul class="navbar-nav bg-gradient-primary sidebar sidebar-dark accordion" id="accordionSidebar">
+            <a class="sidebar-brand d-flex align-items-center justify-content-center" th:href="@{/home}">
+                <div class="sidebar-brand-icon rotate-n-15">
+                    <i class="fas fa-chart-line"></i>
+                </div>
+                <div class="sidebar-brand-text mx-3">Forex <sup>Platform</sup></div>
+            </a>
+
+            <hr class="sidebar-divider my-0">
+
+            <li class="nav-item">
+                <a class="nav-link" th:href="@{/home}">
+                    <i class="fas fa-fw fa-tachometer-alt"></i>
+                    <span>Főoldal</span>
+                </a>
+            </li>
+
+            <hr class="sidebar-divider">
+            <div class="sidebar-heading">MNB Szolgáltatások</div>
+
+            <li class="nav-item active">
+                <a class="nav-link" th:href="@{/soap}">
+                    <i class="fas fa-fw fa-exchange-alt"></i>
+                    <span>SOAP - MNB Árfolyamok</span>
+                </a>
+            </li>
+
+            <hr class="sidebar-divider">
+            <div class="sidebar-heading">Forex Kereskedés</div>
+
+            <li class="nav-item">
+                <a class="nav-link" th:href="@{/forex-account}">
+                    <i class="fas fa-fw fa-user"></i>
+                    <span>Számla Info</span>
+                </a>
+            </li>
+
+            <li class="nav-item">
+                <a class="nav-link" th:href="@{/forex-aktar}">
+                    <i class="fas fa-fw fa-dollar-sign"></i>
+                    <span>Aktuális Árak</span>
+                </a>
+            </li>
+
+            <li class="nav-item">
+                <a class="nav-link" th:href="@{/forex-histar}">
+                    <i class="fas fa-fw fa-chart-area"></i>
+                    <span>Historikus Árak</span>
+                </a>
+            </li>
+
+            <li class="nav-item">
+                <a class="nav-link" th:href="@{/forex-nyit}">
+                    <i class="fas fa-fw fa-plus-circle"></i>
+                    <span>Pozíció Nyitás</span>
+                </a>
+            </li>
+
+            <li class="nav-item">
+                <a class="nav-link" th:href="@{/forex-poz}">
+                    <i class="fas fa-fw fa-table"></i>
+                    <span>Nyitott Pozíciók</span>
+                </a>
+            </li>
+
+            <li class="nav-item">
+                <a class="nav-link" th:href="@{/forex-zar}">
+                    <i class="fas fa-fw fa-times-circle"></i>
+                    <span>Pozíció Zárás</span>
+                </a>
+            </li>
+
+            <hr class="sidebar-divider d-none d-md-block">
+            <div class="text-center d-none d-md-inline">
+                <button class="rounded-circle border-0" id="sidebarToggle"></button>
+            </div>
+        </ul>
+
+        <!-- Content Wrapper -->
+        <div id="content-wrapper" class="d-flex flex-column">
+            <div id="content">
+                <!-- Topbar -->
+                <nav class="navbar navbar-expand navbar-light bg-white topbar mb-4 static-top shadow">
+                    <button id="sidebarToggleTop" class="btn btn-link d-md-none rounded-circle mr-3">
+                        <i class="fa fa-bars"></i>
+                    </button>
+
+                    <form class="d-none d-sm-inline-block form-inline mr-auto ml-md-3 my-2 my-md-0 mw-100 navbar-search">
+                        <div class="input-group">
+                            <input type="text" class="form-control bg-light border-0 small" placeholder="Keresés...">
+                            <div class="input-group-append">
+                                <button class="btn btn-primary" type="button">
+                                    <i class="fas fa-search fa-sm"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </form>
+
+                    <ul class="navbar-nav ml-auto">
+                        <div class="topbar-divider d-none d-sm-block"></div>
+                        <li class="nav-item dropdown no-arrow">
+                            <a class="nav-link dropdown-toggle" href="#" id="userDropdown">
+                                <span class="mr-2 d-none d-lg-inline text-gray-600 small">Felhasználó</span>
+                                <img class="img-profile rounded-circle" src="https://via.placeholder.com/40x40" alt="Profile">
+                            </a>
+                        </li>
+                    </ul>
+                </nav>
+
+                <!-- Page Content -->
+                <div class="container-fluid">
+                    <!-- Page Heading -->
+                    <div class="d-sm-flex align-items-center justify-content-between mb-4">
+                        <h1 class="h3 mb-0 text-gray-800">Magyar Nemzeti Bank - SOAP Árfolyam Lekérdezés</h1>
+                    </div>
+
+                    <!-- SOAP Query Card -->
+                    <div class="card shadow mb-4">
+                        <div class="card-header py-3">
+                            <h6 class="m-0 font-weight-bold text-primary">Árfolyam Lekérdezés</h6>
+                        </div>
+                        <div class="card-body">
+                            <p class="mb-4">Válassza ki a devizát és a dátum intervallumot az árfolyamok lekérdezéséhez.</p>
+
+                            <form th:action="@{/soap/query}" method="post">
+                                <div class="row">
+                                    <div class="col-md-4">
+                                        <div class="form-group">
+                                            <label for="currency" class="form-label">Deviza</label>
+                                            <select name="currency" id="currency" class="form-control" required>
+                                                <option value="">-- Válasszon devizát --</option>
+                                                <option value="EUR">EUR - Euro</option>
+                                                <option value="USD">USD - US Dollar</option>
+                                                <option value="GBP">GBP - British Pound</option>
+                                                <option value="CHF">CHF - Swiss Franc</option>
+                                                <option value="JPY">JPY - Japanese Yen</option>
+                                                <option value="CZK">CZK - Czech Koruna</option>
+                                                <option value="PLN">PLN - Polish Zloty</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <div class="form-group">
+                                            <label for="startDate" class="form-label">Kezdő dátum</label>
+                                            <input type="date" name="startDate" id="startDate" class="form-control" required />
+                                        </div>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <div class="form-group">
+                                            <label for="endDate" class="form-label">Befejező dátum</label>
+                                            <input type="date" name="endDate" id="endDate" class="form-control" required />
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <button type="submit" class="btn btn-primary">
+                                        <i class="fas fa-search"></i> Lekérdezés
+                                    </button>
+                                    <button type="reset" class="btn btn-secondary ml-2">
+                                        <i class="fas fa-eraser"></i> Törlés
+                                    </button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+
+                    <!-- Results section -->
+                    <div th:if="${message}" class="card shadow mb-4">
+                        <div class="card-header py-3">
+                            <h6 class="m-0 font-weight-bold text-primary">Lekérdezés Eredménye</h6>
+                        </div>
+                        <div class="card-body">
+                            <div th:class="${#lists.isEmpty(exchangeRates) ? 'alert alert-warning' : 'alert alert-success'}" role="alert">
+                                <i th:class="${#lists.isEmpty(exchangeRates) ? 'fas fa-exclamation-triangle' : 'fas fa-check-circle'}"></i>
+                                <span th:text="${message}"></span>
+                            </div>
+
+                            <div th:if="${currency}" class="mb-3">
+                                <strong>Keresési paraméterek:</strong><br>
+                                <span class="badge badge-primary">Deviza: <span th:text="${currency}"></span></span>
+                                <span class="badge badge-info">Kezdő dátum: <span th:text="${startDate}"></span></span>
+                                <span class="badge badge-success">Befejező dátum: <span th:text="${endDate}"></span></span>
+                            </div>
+
+                            <!-- Exchange rates table -->
+                            <div th:if="${exchangeRates and !#lists.isEmpty(exchangeRates)}" class="table-responsive mt-4">
+                                <h5 class="mb-3">Árfolyam Adatok</h5>
+                                <table class="table table-bordered">
+                                    <thead class="thead-light">
+                                        <tr>
+                                            <th><i class="fas fa-calendar"></i> Dátum</th>
+                                            <th><i class="fas fa-money-bill-wave"></i> Deviza</th>
+                                            <th><i class="fas fa-hashtag"></i> Egység</th>
+                                            <th><i class="fas fa-chart-line"></i> Árfolyam (HUF)</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr th:each="rate : ${exchangeRates}">
+                                            <td th:text="${rate.date}"></td>
+                                            <td><span class="badge badge-primary" th:text="${rate.currency}"></span></td>
+                                            <td th:text="${rate.unit}"></td>
+                                            <td class="font-weight-bold text-success" th:text="${#numbers.formatDecimal(rate.rate, 0, 4)} + ' Ft'"></td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Chart container -->
+                    <div th:if="${hasChartData}" class="card shadow mb-4">
+                        <div class="card-header py-3">
+                            <h6 class="m-0 font-weight-bold text-primary">Árfolyam Grafikon</h6>
+                        </div>
+                        <div class="card-body">
+                            <div class="chart-area">
+                                <canvas id="exchangeRateChart" width="400" height="100"></canvas>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Footer -->
+            <footer class="sticky-footer bg-white">
+                <div class="container my-auto">
+                    <div class="copyright text-center my-auto">
+                        <span>Copyright &copy; 2025 Forex Platform</span>
+                    </div>
+                </div>
+            </footer>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-easing/1.4.1/jquery.easing.min.js"></script>
+    <script src="/sb-admin-2/js/sb-admin-2.js"></script>
+
+    <script th:if="${hasChartData}">
+    // Exchange Rate Chart
+    var ctx = document.getElementById("exchangeRateChart");
+    var chartDates = /*[[${chartDates}]]*/ [];
+    var chartRates = /*[[${chartRates}]]*/ [];
+    var currency = /*[[${currency}]]*/ '';
+
+    var myLineChart = new Chart(ctx, {
+        type: 'line',
+        data: {
+            labels: chartDates,
+            datasets: [{
+                label: currency + '/HUF Árfolyam',
+                lineTension: 0.3,
+                backgroundColor: "rgba(78, 115, 223, 0.05)",
+                borderColor: "rgba(78, 115, 223, 1)",
+                pointRadius: 3,
+                pointBackgroundColor: "rgba(78, 115, 223, 1)",
+                pointBorderColor: "rgba(78, 115, 223, 1)",
+                pointHoverRadius: 3,
+                pointHoverBackgroundColor: "rgba(78, 115, 223, 1)",
+                pointHoverBorderColor: "rgba(78, 115, 223, 1)",
+                pointHitRadius: 10,
+                pointBorderWidth: 2,
+                data: chartRates,
+            }],
+        },
+        options: {
+            maintainAspectRatio: false,
+            layout: {
+                padding: {
+                    left: 10,
+                    right: 25,
+                    top: 25,
+                    bottom: 0
+                }
+            },
+            scales: {
+                x: {
+                    grid: {
+                        display: false,
+                        drawBorder: false
+                    },
+                    ticks: {
+                        maxTicksLimit: 7
+                    }
+                },
+                y: {
+                    ticks: {
+                        maxTicksLimit: 5,
+                        padding: 10,
+                        callback: function(value, index, values) {
+                            return value.toLocaleString() + ' Ft';
+                        }
+                    },
+                    grid: {
+                        color: "rgb(234, 236, 244)",
+                        zeroLineColor: "rgb(234, 236, 244)",
+                        drawBorder: false,
+                        borderDash: [2],
+                        zeroLineBorderDash: [2]
+                    }
+                }
+            },
+            plugins: {
+                legend: {
+                    display: false
+                },
+                tooltip: {
+                    backgroundColor: "rgb(255,255,255)",
+                    bodyColor: "#858796",
+                    titleMarginBottom: 10,
+                    titleColor: '#6e707e',
+                    titleFont: {
+                        size: 14
+                    },
+                    borderColor: '#dddfeb',
+                    borderWidth: 1,
+                    displayColors: false,
+                    intersect: false,
+                    mode: 'index',
+                    caretPadding: 10,
+                    callbacks: {
+                        label: function(context) {
+                            return currency + '/HUF: ' + context.parsed.y.toLocaleString() + ' Ft';
+                        }
+                    }
+                }
+            }
+        }
+    });
+    </script>
+
+</body>
+</html>

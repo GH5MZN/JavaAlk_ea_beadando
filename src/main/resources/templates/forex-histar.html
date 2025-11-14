@@ -1,0 +1,104 @@
+<!DOCTYPE HTML>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Forex HistÁr - Historikus Árak</title>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no" />
+    <link rel="stylesheet" th:href="@{/hyperspace/assets/css/main.css}" />
+    <noscript><link rel="stylesheet" th:href="@{/hyperspace/assets/css/noscript.css}" /></noscript>
+</head>
+<body class="is-preload">
+
+    <!-- Sidebar -->
+    <section id="sidebar">
+        <div class="inner">
+            <nav>
+                <ul>
+                    <li><a th:href="@{/home}">Kezdőoldal</a></li>
+                    <li><a th:href="@{/soap}">SOAP</a></li>
+                    <li><a th:href="@{/forex-account}">Forex-Account</a></li>
+                    <li><a th:href="@{/forex-aktar}">Forex-AktÁr</a></li>
+                    <li><a th:href="@{/forex-histar}">Forex-HistÁr</a></li>
+                    <li><a th:href="@{/forex-nyit}">Forex-Nyit</a></li>
+                    <li><a th:href="@{/forex-poz}">Forex-Poz</a></li>
+                    <li><a th:href="@{/forex-zar}">Forex-Zár</a></li>
+                </ul>
+            </nav>
+        </div>
+    </section>
+
+    <!-- Wrapper -->
+    <div id="wrapper">
+        <section class="wrapper style3 fade-up">
+            <div class="inner">
+                <h2>Historikus Forex Árak</h2>
+                <p>Válassza ki az instrumentumot és a granularitást a historikus árak megtekintéséhez.</p>
+
+                <form method="get">
+                    <div class="fields">
+                        <div class="field half">
+                            <label for="instrument">Instrumentum</label>
+                            <select name="instrument" id="instrument">
+                                <option value="">-- Válasszon instrumentumot --</option>
+                                <option value="EUR_USD">EUR/USD</option>
+                                <option value="GBP_USD">GBP/USD</option>
+                                <option value="USD_JPY">USD/JPY</option>
+                                <option value="USD_CHF">USD/CHF</option>
+                                <option value="AUD_USD">AUD/USD</option>
+                                <option value="USD_CAD">USD/CAD</option>
+                            </select>
+                        </div>
+                        <div class="field half">
+                            <label for="granularity">Granularitás</label>
+                            <select name="granularity" id="granularity">
+                                <option value="">-- Válasszon granularitást --</option>
+                                <option value="M1">M1 - 1 perc</option>
+                                <option value="M5">M5 - 5 perc</option>
+                                <option value="M15">M15 - 15 perc</option>
+                                <option value="H1">H1 - 1 óra</option>
+                                <option value="H4">H4 - 4 óra</option>
+                                <option value="D">D - Naponta</option>
+                                <option value="W">W - Hetente</option>
+                            </select>
+                        </div>
+                    </div>
+                    <ul class="actions">
+                        <li><input type="submit" value="Historikus Árak Lekérdezése" class="primary" /></li>
+                    </ul>
+                </form>
+
+                <!-- Historical prices display -->
+                <div class="box">
+                    <h3>Utolsó 10 Historikus Ár</h3>
+                    <div class="table-wrapper">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Dátum</th>
+                                    <th>Nyitó</th>
+                                    <th>Legmagasabb</th>
+                                    <th>Legalacsonyabb</th>
+                                    <th>Záró</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td colspan="5"><em>Válasszon instrumentumot és granularitást...</em></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </div>
+
+    <!-- Scripts -->
+    <script th:src="@{/hyperspace/assets/js/jquery.min.js}"></script>
+    <script th:src="@{/hyperspace/assets/js/browser.min.js}"></script>
+    <script th:src="@{/hyperspace/assets/js/breakpoints.min.js}"></script>
+    <script th:src="@{/hyperspace/assets/js/util.js}"></script>
+    <script th:src="@{/hyperspace/assets/js/main.js}"></script>
+
+</body>
+</html>

@@ -1,0 +1,127 @@
+<!DOCTYPE HTML>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Forex Poz - Nyitott Pozíciók</title>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no" />
+    <link rel="stylesheet" th:href="@{/hyperspace/assets/css/main.css}" />
+    <noscript><link rel="stylesheet" th:href="@{/hyperspace/assets/css/noscript.css}" /></noscript>
+</head>
+<body class="is-preload">
+
+    <!-- Sidebar -->
+    <section id="sidebar">
+        <div class="inner">
+            <nav>
+                <ul>
+                    <li><a th:href="@{/home}">Kezdőoldal</a></li>
+                    <li><a th:href="@{/soap}">SOAP</a></li>
+                    <li><a th:href="@{/forex-account}">Forex-Account</a></li>
+                    <li><a th:href="@{/forex-aktar}">Forex-AktÁr</a></li>
+                    <li><a th:href="@{/forex-histar}">Forex-HistÁr</a></li>
+                    <li><a th:href="@{/forex-nyit}">Forex-Nyit</a></li>
+                    <li><a th:href="@{/forex-poz}">Forex-Poz</a></li>
+                    <li><a th:href="@{/forex-zar}">Forex-Zár</a></li>
+                </ul>
+            </nav>
+        </div>
+    </section>
+
+    <!-- Wrapper -->
+    <div id="wrapper">
+        <section class="wrapper style3 fade-up">
+            <div class="inner">
+                <h2>Nyitott Forex Pozíciók</h2>
+                <p>Itt megtekintheti az összes nyitott pozícióját.</p>
+
+                <div class="box">
+                    <h3>Aktív Pozíciók</h3>
+                    <div class="table-wrapper">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Trade ID</th>
+                                    <th>Instrumentum</th>
+                                    <th>Típus</th>
+                                    <th>Mennyiség</th>
+                                    <th>Nyitó Ár</th>
+                                    <th>Jelenlegi Ár</th>
+                                    <th>Nyereség/Veszteség</th>
+                                    <th>Nyitás Ideje</th>
+                                    <th>Művelet</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <!-- Sample data - TODO: Replace with actual positions -->
+                                <tr>
+                                    <td>12345</td>
+                                    <td>EUR/USD</td>
+                                    <td><span class="tag-long">Long</span></td>
+                                    <td>10,000</td>
+                                    <td>1.0850</td>
+                                    <td>1.0875</td>
+                                    <td class="positive">+$250.00</td>
+                                    <td>2025-11-13 10:30</td>
+                                    <td><a th:href="@{/forex-zar}" class="button small">Zárás</a></td>
+                                </tr>
+                                <tr>
+                                    <td>12346</td>
+                                    <td>GBP/USD</td>
+                                    <td><span class="tag-short">Short</span></td>
+                                    <td>-5,000</td>
+                                    <td>1.2650</td>
+                                    <td>1.2630</td>
+                                    <td class="positive">+$100.00</td>
+                                    <td>2025-11-13 14:15</td>
+                                    <td><a th:href="@{/forex-zar}" class="button small">Zárás</a></td>
+                                </tr>
+                                <tr>
+                                    <td>12347</td>
+                                    <td>USD/JPY</td>
+                                    <td><span class="tag-long">Long</span></td>
+                                    <td>8,000</td>
+                                    <td>150.25</td>
+                                    <td>149.80</td>
+                                    <td class="negative">-$120.00</td>
+                                    <td>2025-11-13 16:45</td>
+                                    <td><a th:href="@{/forex-zar}" class="button small">Zárás</a></td>
+                                </tr>
+                                <!-- TODO: Dynamic content from controller -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <div class="box">
+                    <h3>Összegzés</h3>
+                    <div class="row">
+                        <div class="col-6 col-12-medium">
+                            <p><strong>Összes nyitott pozíció:</strong> 3</p>
+                            <p><strong>Összes befektetett tőke:</strong> $2,300.00</p>
+                        </div>
+                        <div class="col-6 col-12-medium">
+                            <p><strong>Összes nyereség/veszteség:</strong> <span class="positive">+$230.00</span></p>
+                            <p><strong>Használt margin:</strong> $575.00</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </div>
+
+    <!-- Scripts -->
+    <script th:src="@{/hyperspace/assets/js/jquery.min.js}"></script>
+    <script th:src="@{/hyperspace/assets/js/browser.min.js}"></script>
+    <script th:src="@{/hyperspace/assets/js/breakpoints.min.js}"></script>
+    <script th:src="@{/hyperspace/assets/js/util.js}"></script>
+    <script th:src="@{/hyperspace/assets/js/main.js}"></script>
+
+    <style>
+        .tag-long { background: #28a745; color: white; padding: 2px 8px; border-radius: 3px; font-size: 0.8em; }
+        .tag-short { background: #dc3545; color: white; padding: 2px 8px; border-radius: 3px; font-size: 0.8em; }
+        .positive { color: #28a745; font-weight: bold; }
+        .negative { color: #dc3545; font-weight: bold; }
+    </style>
+
+</body>
+</html>

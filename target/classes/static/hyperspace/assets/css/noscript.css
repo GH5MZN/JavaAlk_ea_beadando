@@ -1,0 +1,15 @@
+/* noscript */
+
+body.is-preload {
+	opacity: 1;
+}
+
+body.is-preload #wrapper {
+	opacity: 1;
+}
+
+body.is-preload #wrapper > * {
+	opacity: 1;
+	transform: none;
+}
+

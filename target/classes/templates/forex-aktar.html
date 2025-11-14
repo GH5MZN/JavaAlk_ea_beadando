@@ -1,0 +1,78 @@
+<!DOCTYPE HTML>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Forex AktÁr - Aktuális Árak</title>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no" />
+    <link rel="stylesheet" th:href="@{/hyperspace/assets/css/main.css}" />
+    <noscript><link rel="stylesheet" th:href="@{/hyperspace/assets/css/noscript.css}" /></noscript>
+</head>
+<body class="is-preload">
+
+    <!-- Sidebar -->
+    <section id="sidebar">
+        <div class="inner">
+            <nav>
+                <ul>
+                    <li><a th:href="@{/home}">Kezdőoldal</a></li>
+                    <li><a th:href="@{/soap}">SOAP</a></li>
+                    <li><a th:href="@{/forex-account}">Forex-Account</a></li>
+                    <li><a th:href="@{/forex-aktar}">Forex-AktÁr</a></li>
+                    <li><a th:href="@{/forex-histar}">Forex-HistÁr</a></li>
+                    <li><a th:href="@{/forex-nyit}">Forex-Nyit</a></li>
+                    <li><a th:href="@{/forex-poz}">Forex-Poz</a></li>
+                    <li><a th:href="@{/forex-zar}">Forex-Zár</a></li>
+                </ul>
+            </nav>
+        </div>
+    </section>
+
+    <!-- Wrapper -->
+    <div id="wrapper">
+        <section class="wrapper style2 fade-up">
+            <div class="inner">
+                <h2>Aktuális Forex Árak</h2>
+                <p>Válassza ki az instrumentumot az aktuális ár megtekintéséhez.</p>
+
+                <form method="get">
+                    <div class="fields">
+                        <div class="field half">
+                            <label for="instrument">Instrumentum</label>
+                            <select name="instrument" id="instrument">
+                                <option value="">-- Válasszon instrumentumot --</option>
+                                <option value="EUR_USD">EUR/USD</option>
+                                <option value="GBP_USD">GBP/USD</option>
+                                <option value="USD_JPY">USD/JPY</option>
+                                <option value="USD_CHF">USD/CHF</option>
+                                <option value="AUD_USD">AUD/USD</option>
+                                <option value="USD_CAD">USD/CAD</option>
+                                <option value="EUR_GBP">EUR/GBP</option>
+                                <option value="EUR_JPY">EUR/JPY</option>
+                            </select>
+                        </div>
+                        <div class="field half">
+                            <label>&nbsp;</label>
+                            <input type="submit" value="Ár Lekérdezése" class="primary" />
+                        </div>
+                    </div>
+                </form>
+
+                <!-- Price display -->
+                <div class="box">
+                    <h3>Aktuális Ár</h3>
+                    <p><em>Válasszon instrumentumot az ár megjelenítéséhez...</em></p>
+                    <!-- TODO: Display actual current price -->
+                </div>
+            </div>
+        </section>
+    </div>
+
+    <!-- Scripts -->
+    <script th:src="@{/hyperspace/assets/js/jquery.min.js}"></script>
+    <script th:src="@{/hyperspace/assets/js/browser.min.js}"></script>
+    <script th:src="@{/hyperspace/assets/js/breakpoints.min.js}"></script>
+    <script th:src="@{/hyperspace/assets/js/util.js}"></script>
+    <script th:src="@{/hyperspace/assets/js/main.js}"></script>
+
+</body>
+</html>
