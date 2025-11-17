@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="hu">
+<body>
+<div th:fragment="sidebar">
+    <!-- Sidebar -->
+    <ul class="navbar-nav bg-gradient-primary sidebar sidebar-dark accordion" id="accordionSidebar">
+
+        <!-- Sidebar - Brand -->
+        <a class="sidebar-brand d-flex align-items-center justify-content-center" th:href="@{/}">
+            <div class="sidebar-brand-icon rotate-n-15">
+                <i class="fas fa-laugh-wink"></i>
+            </div>
+            <div class="sidebar-brand-text mx-3">SB Admin <sup>2</sup></div>
+        </a>
+
+        <!-- Divider -->
+        <hr class="sidebar-divider my-0">
+
+        <!-- Nav Item - Főoldal -->
+        <li class="nav-item active">
+            <a class="nav-link" th:href="@{/}">
+                <i class="fas fa-fw fa-home"></i>
+                <span>Főoldal</span></a>
+        </li>
+
+        <!-- Divider -->
+        <hr class="sidebar-divider">
+
+        <!-- Nav Item - SOAP -->
+        <li class="nav-item">
+            <a class="nav-link" th:href="@{/soap}">
+                <i class="fas fa-fw fa-cloud"></i>
+                <span>SOAP</span></a>
+        </li>
+
+        <!-- Nav Item - FOREX-Account -->
+        <li class="nav-item">
+            <a class="nav-link" th:href="@{/forex-account}">
+                <i class="fas fa-fw fa-user"></i>
+                <span>FOREX-Account</span></a>
+        </li>
+
+        <!-- Nav Item - FOREX-AktÁr -->
+        <li class="nav-item">
+            <a class="nav-link" th:href="@{/forex-aktar}">
+                <i class="fas fa-fw fa-dollar-sign"></i>
+                <span>FOREX-AktÁr</span></a>
+        </li>
+
+        <!-- Nav Item - FOREX-HistÁr -->
+        <li class="nav-item">
+            <a class="nav-link" th:href="@{/forex-histar}">
+                <i class="fas fa-fw fa-history"></i>
+                <span>FOREX-HistÁr</span></a>
+        </li>
+
+        <!-- Nav Item - FOREX-Nyit -->
+        <li class="nav-item">
+            <a class="nav-link" th:href="@{/forex-nyit}">
+                <i class="fas fa-fw fa-folder-open"></i>
+                <span>FOREX-Nyit</span></a>
+        </li>
+
+        <!-- Nav Item - FOREX-Poz -->
+        <li class="nav-item">
+            <a class="nav-link" th:href="@{/forex-poz}">
+                <i class="fas fa-fw fa-chart-line"></i>
+                <span>FOREX-Poz</span></a>
+        </li>
+
+        <!-- Nav Item - FOREX-Zár -->
+        <li class="nav-item">
+            <a class="nav-link" th:href="@{/forex-zar}">
+                <i class="fas fa-fw fa-lock"></i>
+                <span>FOREX-Zár</span></a>
+        </li>
+
+        <!-- Divider -->
+        <hr class="sidebar-divider d-none d-md-block">
+
+        <!-- Sidebar Toggler (Sidebar) -->
+        <div class="text-center d-none d-md-inline">
+            <button class="rounded-circle border-0" id="sidebarToggle"></button>
+        </div>
+
+    </ul>
+    <!-- End of Sidebar -->
+</div>
+</body>
+</html>

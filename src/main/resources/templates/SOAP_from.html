@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="hu">
+<head>
+    <meta charset="UTF-8">
+    <title>SOAP űrlap</title>
+    <link th:href="@{/vendor/fontawesome-free/css/all.min.css}" rel="stylesheet">
+    <link th:href="@{/css/sb-admin-2.min.css}" rel="stylesheet">
+</head>
+<body id="page-top">
+<div id="wrapper">
+    <div th:replace="~{fragments/sidebar :: sidebar}"></div>
+    <div id="content-wrapper" class="d-flex flex-column">
+        <div id="content">
+            <div th:replace="~{fragments/topbar :: topbar}"></div>
+            <div class="container-fluid">
+                <h1 class="h3 mb-4 text-gray-800">SOAP Árfolyam lekérdezés</h1>
+
+                <div class="card shadow mb-4">
+                    <div class="card-header py-3">
+                        <h6 class="m-0 font-weight-bold text-primary">Válassz devizát és időszakot</h6>
+                    </div>
+                    <div class="card-body">
+                        <form action="#" th:action="@{/soap}" th:object="${param}" method="post">
+                            <div class="form-group">
+                                <label for="currencies">Deviza:</label>
+                                <select class="form-control" id="currencies" name="currencies" th:field="*{currency}">
+                                    <option value="EUR">EUR</option>
+                                    <option value="USD">USD</option>
+                                    <option value="GBP">GBP</option>
+                                    <option value="JPY">JPY</option>
+                                </select>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="startDate">Kezdő dátum:</label>
+                                <input type="date" class="form-control" id="startDate" th:field="*{startDate}" th:max="${#temporals.format(#temporals.createNow(), 'yyyy-MM-dd')}">
+                            </div>
+
+                            <div class="form-group">
+                                <label for="endDate">Befejező dátum:</label>
+                                <input type="date" class="form-control" id="endDate" th:field="*{endDate}" th:max="${#temporals.format(#temporals.createNow(), 'yyyy-MM-dd')}">
+                            </div>
+
+                            <button type="submit" class="btn btn-primary">
+                                <i class="fas fa-search"></i> Keresés
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script th:src="@{/vendor/jquery/jquery.min.js}"></script>
+<script th:src="@{/vendor/bootstrap/js/bootstrap.bundle.min.js}"></script>
+<script th:src="@{/js/sb-admin-2.min.js}"></script>
+</body>
+</html>
