@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="hu">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title th:text="${title}">FOREX AktÁr</title>
+    <link th:href="@{/vendor/fontawesome-free/css/all.min.css}" rel="stylesheet">
+    <link th:href="@{/css/sb-admin-2.min.css}" rel="stylesheet">
+</head>
+<body id="page-top">
+<div id="wrapper">
+    <div th:replace="~{fragments/sidebar :: sidebar}"></div>
+    <div id="content-wrapper" class="d-flex flex-column">
+        <div id="content">
+            <div th:replace="~{fragments/topbar :: topbar}"></div>
+            <div class="container-fluid">
+                <h1 class="h3 mb-4 text-gray-800" th:text="${title}">FOREX AktÁr</h1>
+
+                <div class="card shadow mb-4">
+                    <div class="card-header py-3">
+                        <h6 class="m-0 font-weight-bold text-primary">Aktuális árfolyam lekérdezés</h6>
+                    </div>
+                    <div class="card-body">
+                        <p>Válassz egy devizapárt az aktuális árfolyam lekérdezéséhez:</p>
+
+                        <form action="#" th:action="@{/forex-aktar}" th:object="${par}" method="post">
+                            <div class="form-group">
+                                <label for="instrument">Devizapár:</label>
+                                <select class="form-control" id="instrument" th:field="*{instrument}">
+                                    <option value="EUR_USD">EUR/USD</option>
+                                    <option value="GBP_USD">GBP/USD</option>
+                                    <option value="USD_JPY">USD/JPY</option>
+                                    <option value="USD_CHF">USD/CHF</option>
+                                    <option value="AUD_USD">AUD/USD</option>
+                                    <option value="USD_CAD">USD/CAD</option>
+                                    <option value="NZD_USD">NZD/USD</option>
+                                    <option value="EUR_GBP">EUR/GBP</option>
+                                    <option value="EUR_JPY">EUR/JPY</option>
+                                    <option value="GBP_JPY">GBP/JPY</option>
+                                </select>
+                            </div>
+
+                            <button type="submit" class="btn btn-primary">
+                                <i class="fas fa-search"></i> Árfolyam lekérdezése
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- Footer -->
+        <footer class="sticky-footer bg-white">
+            <div class="container my-auto">
+                <div class="copyright text-center my-auto">
+                    <span>Copyright &copy; Your Website 2025</span>
+                </div>
+            </div>
+        </footer>
+    </div>
+</div>
+
+<script th:src="@{/vendor/jquery/jquery.min.js}"></script>
+<script th:src="@{/vendor/bootstrap/js/bootstrap.bundle.min.js}"></script>
+<script th:src="@{/vendor/jquery-easing/jquery.easing.min.js}"></script>
+<script th:src="@{/js/sb-admin-2.min.js}"></script>
+</body>
+</html>
