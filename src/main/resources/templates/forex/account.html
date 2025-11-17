@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="hu">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title th:text="${title}">FOREX Account</title>
+    <link th:href="@{/vendor/fontawesome-free/css/all.min.css}" rel="stylesheet">
+    <link th:href="@{/css/sb-admin-2.min.css}" rel="stylesheet">
+</head>
+<body id="page-top">
+<div id="wrapper">
+    <div th:replace="~{fragments/sidebar :: sidebar}"></div>
+    <div id="content-wrapper" class="d-flex flex-column">
+        <div id="content">
+            <div th:replace="~{fragments/topbar :: topbar}"></div>
+            <div class="container-fluid">
+                <h1 class="h3 mb-4 text-gray-800" th:text="${title}">FOREX Account</h1>
+
+                <!-- Account Summary Cards -->
+                <div class="row">
+                    <!-- Balance Card -->
+                    <div class="col-xl-3 col-md-6 mb-4">
+                        <div class="card border-left-primary shadow h-100 py-2">
+                            <div class="card-body">
+                                <div class="row no-gutters align-items-center">
+                                    <div class="col mr-2">
+                                        <div class="text-xs font-weight-bold text-primary text-uppercase mb-1">
+                                            Account Balance</div>
+                                        <div class="h5 mb-0 font-weight-bold text-gray-800">
+                                            <span th:text="${tradeApp.currency}">USD</span>
+                                            <span th:text="${#numbers.formatDecimal(tradeApp.balance, 1, 2)}">10,000.00</span>
+                                        </div>
+                                    </div>
+                                    <div class="col-auto">
+                                        <i class="fas fa-dollar-sign fa-2x text-gray-300"></i>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Unrealized P/L Card -->
+                    <div class="col-xl-3 col-md-6 mb-4">
+                        <div class="card border-left-success shadow h-100 py-2">
+                            <div class="card-body">
+                                <div class="row no-gutters align-items-center">
+                                    <div class="col mr-2">
+                                        <div class="text-xs font-weight-bold text-success text-uppercase mb-1">
+                                            Unrealized P/L</div>
+                                        <div class="h5 mb-0 font-weight-bold text-gray-800">
+                                            <span th:text="${tradeApp.currency}">USD</span>
+                                            <span th:text="${#numbers.formatDecimal(tradeApp.unrealizedPL, 1, 2)}">250.50</span>
+                                        </div>
+                                    </div>
+                                    <div class="col-auto">
+                                        <i class="fas fa-chart-line fa-2x text-gray-300"></i>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Margin Used Card -->
+                    <div class="col-xl-3 col-md-6 mb-4">
+                        <div class="card border-left-warning shadow h-100 py-2">
+                            <div class="card-body">
+                                <div class="row no-gutters align-items-center">
+                                    <div class="col mr-2">
+                                        <div class="text-xs font-weight-bold text-warning text-uppercase mb-1">
+                                            Margin Used</div>
+                                        <div class="h5 mb-0 font-weight-bold text-gray-800">
+                                            <span th:text="${tradeApp.currency}">USD</span>
+                                            <span th:text="${#numbers.formatDecimal(tradeApp.marginUsed, 1, 2)}">2,500.00</span>
+                                        </div>
+                                    </div>
+                                    <div class="col-auto">
+                                        <i class="fas fa-percentage fa-2x text-gray-300"></i>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Open Trades Card -->
+                    <div class="col-xl-3 col-md-6 mb-4">
+                        <div class="card border-left-info shadow h-100 py-2">
+                            <div class="card-body">
+                                <div class="row no-gutters align-items-center">
+                                    <div class="col mr-2">
+                                        <div class="text-xs font-weight-bold text-info text-uppercase mb-1">
+                                            Open Trades</div>
+                                        <div class="h5 mb-0 font-weight-bold text-gray-800" th:text="${tradeApp.openTradeCount}">5</div>
+                                    </div>
+                                    <div class="col-auto">
+                                        <i class="fas fa-exchange-alt fa-2x text-gray-300"></i>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Account Details Card -->
+                <div class="card shadow mb-4">
+                    <div class="card-header py-3">
+                        <h6 class="m-0 font-weight-bold text-primary">Account Information</h6>
+                    </div>
+                    <div class="card-body">
+                        <div class="table-responsive">
+                            <table class="table table-bordered" width="100%" cellspacing="0">
+                                <tbody>
+                                    <tr>
+                                        <th width="30%">Account ID</th>
+                                        <td th:text="${tradeApp.accountId}">101-004-1234567-001</td>
+                                    </tr>
+                                    <tr>
+                                        <th>Account Name</th>
+                                        <td th:text="${tradeApp.accountName}">Primary Trading Account</td>
+                                    </tr>
+                                    <tr>
+                                        <th>Currency</th>
+                                        <td th:text="${tradeApp.currency}">USD</td>
+                                    </tr>
+                                    <tr>
+                                        <th>Balance</th>
+                                        <td>
+                                            <span th:text="${tradeApp.currency}">USD</span>
+                                            <span th:text="${#numbers.formatDecimal(tradeApp.balance, 1, 2)}">10,000.00</span>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <th>Unrealized P/L</th>
+                                        <td>
+                                            <span th:text="${tradeApp.currency}">USD</span>
+                                            <span th:text="${#numbers.formatDecimal(tradeApp.unrealizedPL, 1, 2)}">250.50</span>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <th>Margin Used</th>
+                                        <td>
+                                            <span th:text="${tradeApp.currency}">USD</span>
+                                            <span th:text="${#numbers.formatDecimal(tradeApp.marginUsed, 1, 2)}">2,500.00</span>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <th>Margin Available</th>
+                                        <td>
+                                            <span th:text="${tradeApp.currency}">USD</span>
+                                            <span th:text="${#numbers.formatDecimal(tradeApp.marginAvailable, 1, 2)}">7,500.00</span>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <th>Open Trade Count</th>
+                                        <td th:text="${tradeApp.openTradeCount}">5</td>
+                                    </tr>
+                                    <tr>
+                                        <th>Open Position Count</th>
+                                        <td th:text="${tradeApp.openPositionCount}">3</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- Footer -->
+        <footer class="sticky-footer bg-white">
+            <div class="container my-auto">
+                <div class="copyright text-center my-auto">
+                    <span>Copyright &copy; Your Website 2025</span>
+                </div>
+            </div>
+        </footer>
+    </div>
+</div>
+
+<script th:src="@{/vendor/jquery/jquery.min.js}"></script>
+<script th:src="@{/vendor/bootstrap/js/bootstrap.bundle.min.js}"></script>
+<script th:src="@{/vendor/jquery-easing/jquery.easing.min.js}"></script>
+<script th:src="@{/js/sb-admin-2.min.js}"></script>
+</body>
+</html>
+

@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="hu">
+<head>
+    <meta charset="UTF-8">
+    <title>SOAP Eredmény</title>
+    <link th:href="@{/vendor/fontawesome-free/css/all.min.css}" rel="stylesheet">
+    <link th:href="@{/css/sb-admin-2.min.css}" rel="stylesheet">
+</head>
+<body id="page-top">
+<div id="wrapper">
+    <div th:replace="~{fragments/sidebar :: sidebar}"></div>
+    <div id="content-wrapper" class="d-flex flex-column">
+        <div id="content">
+            <div th:replace="~{fragments/topbar :: topbar}"></div>
+            <div class="container-fluid">
+                <h1 class="h3 mb-4 text-gray-800">Historikus árfolyamok</h1>
+
+                <!-- Összefoglaló kártya -->
+                <div class="card shadow mb-4">
+                    <div class="card-header py-3">
+                        <h6 class="m-0 font-weight-bold text-primary">Lekérdezés adatai</h6>
+                    </div>
+                    <div class="card-body">
+                        <p><strong>Deviza:</strong> <span th:text="${currency}"></span></p>
+                        <p><strong>Kezdő dátum:</strong> <span th:text="${startDate}"></span></p>
+                        <p><strong>Befejező dátum:</strong> <span th:text="${endDate}"></span></p>
+                    </div>
+                </div>
+
+                <!-- Chart kártya -->
+                <div class="card shadow mb-4">
+                    <div class="card-header py-3">
+                        <h6 class="m-0 font-weight-bold text-primary">Árfolyam grafikon</h6>
+                    </div>
+                    <div class="card-body">
+                        <div class="chart-area">
+                            <canvas id="myLineChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Táblázat kártya -->
+                <div class="card shadow mb-4">
+                    <div class="card-header py-3">
+                        <h6 class="m-0 font-weight-bold text-primary">Árfolyam részletek</h6>
+                    </div>
+                    <div class="card-body">
+                        <div class="table-responsive">
+                            <table class="table table-bordered" id="dataTable" width="100%" cellspacing="0">
+                                <thead>
+                                    <tr>
+                                        <th>Dátum</th>
+                                        <th>Árfolyam (HUF)</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr th:each="date, iterStat : ${dates}">
+                                        <td th:text="${date}"></td>
+                                        <td th:text="${rates[iterStat.index]}"></td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Nyers XML adatok (opcionális) -->
+                <div class="card shadow mb-4">
+                    <div class="card-header py-3">
+                        <h6 class="m-0 font-weight-bold text-primary">
+                            <a data-toggle="collapse" href="#collapseXml" role="button" aria-expanded="false">
+                                Nyers XML adatok (kattints a megjelenítéshez)
+                            </a>
+                        </h6>
+                    </div>
+                    <div class="collapse" id="collapseXml">
+                        <div class="card-body">
+                            <pre th:text="${rawXml}"></pre>
+                        </div>
+                    </div>
+                </div>
+
+                <a th:href="@{/soap}" class="btn btn-primary">
+                    <i class="fas fa-arrow-left"></i> Vissza az űrlapra
+                </a>
+            </div>
+        </div>
+        <!-- Footer -->
+        <footer class="sticky-footer bg-white">
+            <div class="container my-auto">
+                <div class="copyright text-center my-auto">
+                    <span>Copyright &copy; Your Website 2025</span>
+                </div>
+            </div>
+        </footer>
+    </div>
+</div>
+
+<script th:src="@{/vendor/jquery/jquery.min.js}"></script>
+<script th:src="@{/vendor/bootstrap/js/bootstrap.bundle.min.js}"></script>
+<script th:src="@{/vendor/jquery-easing/jquery.easing.min.js}"></script>
+<script th:src="@{/js/sb-admin-2.min.js}"></script>
+<script th:src="@{/vendor/chart.js/Chart.min.js}"></script>
+
+<script th:inline="javascript">
+    /*<![CDATA[*/
+    // Adatok átvétele Thymeleaf-ből
+    var dates = /*[[${dates}]]*/ [];
+    var rates = /*[[${rates}]]*/ [];
+    var currency = /*[[${currency}]]*/ 'Currency';
+
+    // Chart.js konfiguráció
+    var ctx = document.getElementById("myLineChart");
+    var myLineChart = new Chart(ctx, {
+        type: 'line',
+        data: {
+            labels: dates,
+            datasets: [{
+                label: currency + " / HUF",
+                lineTension: 0.3,
+                backgroundColor: "rgba(78, 115, 223, 0.05)",
+                borderColor: "rgba(78, 115, 223, 1)",
+                pointRadius: 3,
+                pointBackgroundColor: "rgba(78, 115, 223, 1)",
+                pointBorderColor: "rgba(78, 115, 223, 1)",
+                pointHoverRadius: 3,
+                pointHoverBackgroundColor: "rgba(78, 115, 223, 1)",
+                pointHoverBorderColor: "rgba(78, 115, 223, 1)",
+                pointHitRadius: 10,
+                pointBorderWidth: 2,
+                data: rates,
+            }],
+        },
+        options: {
+            maintainAspectRatio: false,
+            layout: {
+                padding: {
+                    left: 10,
+                    right: 25,
+                    top: 25,
+                    bottom: 0
+                }
+            },
+            scales: {
+                xAxes: [{
+                    time: {
+                        unit: 'date'
+                    },
+                    gridLines: {
+                        display: false,
+                        drawBorder: false
+                    },
+                    ticks: {
+                        maxTicksLimit: 10
+                    }
+                }],
+                yAxes: [{
+                    ticks: {
+                        maxTicksLimit: 5,
+                        padding: 10,
+                        callback: function(value, index, values) {
+                            return value.toFixed(2) + ' HUF';
+                        }
+                    },
+                    gridLines: {
+                        color: "rgb(234, 236, 244)",
+                        zeroLineColor: "rgb(234, 236, 244)",
+                        drawBorder: false,
+                        borderDash: [2],
+                        zeroLineBorderDash: [2]
+                    }
+                }],
+            },
+            legend: {
+                display: true
+            },
+            tooltips: {
+                backgroundColor: "rgb(255,255,255)",
+                bodyFontColor: "#858796",
+                titleMarginBottom: 10,
+                titleFontColor: '#6e707e',
+                titleFontSize: 14,
+                borderColor: '#dddfeb',
+                borderWidth: 1,
+                xPadding: 15,
+                yPadding: 15,
+                displayColors: false,
+                intersect: false,
+                mode: 'index',
+                caretPadding: 10,
+                callbacks: {
+                    label: function(tooltipItem, chart) {
+                        var datasetLabel = chart.datasets[tooltipItem.datasetIndex].label || '';
+                        return datasetLabel + ': ' + tooltipItem.yLabel.toFixed(2) + ' HUF';
+                    }
+                }
+            }
+        }
+    });
+    /*]]>*/
+</script>
+</body>
+</html>
