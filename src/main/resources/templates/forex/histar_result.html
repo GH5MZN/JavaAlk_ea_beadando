@@ -6,6 +6,7 @@
     <title th:text="${title}">FOREX HistÁr - Eredmény</title>
     <link th:href="@{/vendor/fontawesome-free/css/all.min.css}" rel="stylesheet">
     <link th:href="@{/css/sb-admin-2.min.css}" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 <body id="page-top">
 <div id="wrapper">
@@ -19,30 +20,23 @@
                 <div class="card shadow mb-4">
                     <div class="card-header py-3">
                         <h6 class="m-0 font-weight-bold text-primary">
-                            Historikus árfolyamok: <span th:text="${instr}">EUR_USD</span>
-                            <span class="text-muted">(<span th:text="${granularity}">H1</span>)</span>
+                            Historikus árfolyam: <span th:text="${instrument}"></span> - <span th:text="${granularity}"></span>
                         </h6>
                     </div>
                     <div class="card-body">
-                        <div class="alert alert-info" role="alert">
-                            <h5 class="alert-heading">
-                                <i class="fas fa-chart-area"></i> Candlestick adatok (OHLC)
-                            </h5>
-                            <p class="mb-0">
-                                <strong>Open:</strong> Nyitó ár &nbsp;|&nbsp;
-                                <strong>High:</strong> Legmagasabb ár &nbsp;|&nbsp;
-                                <strong>Low:</strong> Legalacsonyabb ár &nbsp;|&nbsp;
-                                <strong>Close:</strong> Záró ár
-                            </p>
-                        </div>
-                        <hr>
-                        <div th:utext="${price}">
-                            <!-- Az árfolyam adatok táblázat formátumban jelennek meg itt -->
+                        <!-- Chart -->
+                        <div class="mb-4">
+                            <canvas id="myChart"></canvas>
                         </div>
 
-                        <a th:href="@{/forex-histar}" class="btn btn-primary mt-3">
-                            <i class="fas fa-arrow-left"></i> Vissza az űrlapra
-                        </a>
+                        <!-- Táblázat -->
+                        <div th:utext="${data}"></div>
+
+                        <div class="mt-4">
+                            <a href="/forex-histar" class="btn btn-primary">
+                                <i class="fas fa-arrow-left"></i> Vissza az űrlaphoz
+                            </a>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -57,6 +51,64 @@
         </footer>
     </div>
 </div>
+
+<script th:inline="javascript">
+    /*<![CDATA[*/
+    const ctx = document.getElementById('myChart');
+
+    const labels = [/*[[${labels}]]*/];
+    const dataClose = [/*[[${dataClose}]]*/];
+    const dataHigh = [/*[[${dataHigh}]]*/];
+    const dataLow = [/*[[${dataLow}]]*/];
+
+    new Chart(ctx, {
+        type: 'line',
+        data: {
+            labels: labels,
+            datasets: [
+                {
+                    label: 'Záró árfolyam (Close)',
+                    data: dataClose,
+                    borderColor: 'rgb(75, 192, 192)',
+                    backgroundColor: 'rgba(75, 192, 192, 0.2)',
+                    tension: 0.1
+                },
+                {
+                    label: 'Legmagasabb (High)',
+                    data: dataHigh,
+                    borderColor: 'rgb(54, 162, 235)',
+                    backgroundColor: 'rgba(54, 162, 235, 0.2)',
+                    tension: 0.1
+                },
+                {
+                    label: 'Legalacsonyabb (Low)',
+                    data: dataLow,
+                    borderColor: 'rgb(255, 99, 132)',
+                    backgroundColor: 'rgba(255, 99, 132, 0.2)',
+                    tension: 0.1
+                }
+            ]
+        },
+        options: {
+            responsive: true,
+            plugins: {
+                legend: {
+                    position: 'top',
+                },
+                title: {
+                    display: true,
+                    text: 'Historikus árfolyam változás'
+                }
+            },
+            scales: {
+                y: {
+                    beginAtZero: false
+                }
+            }
+        }
+    });
+    /*]]>*/
+</script>
 
 <script th:src="@{/vendor/jquery/jquery.min.js}"></script>
 <script th:src="@{/vendor/bootstrap/js/bootstrap.bundle.min.js}"></script>

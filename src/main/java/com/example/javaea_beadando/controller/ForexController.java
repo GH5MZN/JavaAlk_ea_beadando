@@ -12,6 +12,7 @@ import com.oanda.v20.pricing.ClientPrice;
 import com.oanda.v20.pricing.PricingGetRequest;
 import com.oanda.v20.pricing.PricingGetResponse;
 import com.oanda.v20.trade.Trade;
+import com.oanda.v20.trade.TradeClose404RequestException;
 import com.oanda.v20.trade.TradeCloseRequest;
 import com.oanda.v20.trade.TradeListResponse;
 import com.oanda.v20.trade.TradeSpecifier;
@@ -136,16 +137,83 @@ public class ForexController {
         return "forex/histar";
     }
 
+    @PostMapping("/forex-histar")
+    public String forexHistarResult(@ModelAttribute MessageHistPrice messageHistPrice, Model model) {
+        StringBuilder strOut = new StringBuilder();
+        List<String> labels = new ArrayList<>();
+        List<Double> closeData = new ArrayList<>();
+        List<Double> highData = new ArrayList<>();
+        List<Double> lowData = new ArrayList<>();
+
+        try {
+            InstrumentCandlesRequest request = new InstrumentCandlesRequest(
+                    new InstrumentName(messageHistPrice.getInstrument()));
+            request.setGranularity(valueOf(messageHistPrice.getGranularity()));
+            request.setCount(10L);
+
+            InstrumentCandlesResponse resp = ctx.instrument.candles(request);
+            List<Candlestick> candles = resp.getCandles();
+
+            if (candles.isEmpty()) {
+                strOut.append("<p class='text-warning'>Nincs elérhető historikus adat.</p>");
+            } else {
+                strOut.append("<table class='table table-bordered table-striped'>");
+                strOut.append("<thead class='thead-dark'>");
+                strOut.append("<tr><th>Időpont</th><th>Open</th><th>High</th><th>Low</th><th>Close</th><th>Volume</th></tr>");
+                strOut.append("</thead><tbody>");
+
+                for (Candlestick candle : candles) {
+                    labels.add(candle.getTime().toString());
+                    closeData.add(Double.parseDouble(candle.getMid().getC().toString()));
+                    highData.add(Double.parseDouble(candle.getMid().getH().toString()));
+                    lowData.add(Double.parseDouble(candle.getMid().getL().toString()));
+
+                    strOut.append("<tr>");
+                    strOut.append("<td>").append(candle.getTime()).append("</td>");
+                    strOut.append("<td>").append(candle.getMid().getO()).append("</td>");
+                    strOut.append("<td class='text-success'>").append(candle.getMid().getH()).append("</td>");
+                    strOut.append("<td class='text-danger'>").append(candle.getMid().getL()).append("</td>");
+                    strOut.append("<td><strong>").append(candle.getMid().getC()).append("</strong></td>");
+                    strOut.append("<td>").append(candle.getVolume()).append("</td>");
+                    strOut.append("</tr>");
+                }
+                strOut.append("</tbody></table>");
+            }
+
+        } catch (Exception e) {
+            strOut.append("<div class='alert alert-danger'>");
+            strOut.append("<h5><i class='fas fa-exclamation-circle'></i> Hiba történt</h5>");
+            strOut.append("<p><strong>Hibaüzenet:</strong> ").append(e.getMessage()).append("</p>");
+
+            if (e.getMessage() != null && e.getMessage().contains("Authorization")) {
+                strOut.append("<p>Ellenőrizd, hogy az API token helyes-e a Config.java fájlban!</p>");
+            }
+
+            strOut.append("</div>");
+        }
+
+        model.addAttribute("title", "FOREX HistÁr - Eredmény");
+        model.addAttribute("instrument", messageHistPrice.getInstrument());
+        model.addAttribute("granularity", messageHistPrice.getGranularity());
+        model.addAttribute("data", strOut.toString());
+        model.addAttribute("labels", labels);
+        model.addAttribute("closeData", closeData);
+        model.addAttribute("highData", highData);
+        model.addAttribute("lowData", lowData);
+
+        return "forex/histar_result";
+    }
+
     @PostMapping("/forex-nyit")
     public String forexNyitResult(
-            @ModelAttribute("instrument") String instrument,
-            @ModelAttribute("units") int units,
+            @RequestParam("instrument") String instrument,
+            @RequestParam("units") int units,
             Model model
     ) {
         StringBuilder strOut = new StringBuilder();
 
         try {
-            // Market order létrehozása OANDA-n
+
             OrderCreateRequest orderReq = new OrderCreateRequest(Config.ACCOUNTID);
 
             MarketOrderRequest marketOrder = new MarketOrderRequest();
@@ -154,14 +222,20 @@ public class ForexController {
 
             orderReq.setOrder(marketOrder);
 
-            // Order elküldése
             OrderCreateResponse resp = ctx.order.create(orderReq);
 
             strOut.append("<div class='alert alert-success'>");
             strOut.append("<h5>Pozíció megnyitva!</h5>");
             strOut.append("<p><strong>Instrument:</strong> ").append(instrument).append("</p>");
             strOut.append("<p><strong>Mennyiség:</strong> ").append(units).append("</p>");
-            strOut.append("<p><strong>Order ID:</strong> ").append(resp.getOrderCreateTransaction().getId()).append("</p>");
+
+            if (resp.getOrderFillTransaction() != null && resp.getOrderFillTransaction().getTradeOpened() != null) {
+                strOut.append("<p><strong>Trade ID:</strong> ").append(resp.getOrderFillTransaction().getTradeOpened().getTradeID()).append("</p>");
+                strOut.append("<p class='text-muted'><small>Ez a Trade ID-t használd a pozíció zárásakor!</small></p>");
+            } else {
+                strOut.append("<p><strong>Order ID:</strong> ").append(resp.getOrderCreateTransaction().getId()).append("</p>");
+            }
+
             strOut.append("</div>");
 
         } catch (Exception e) {
@@ -210,42 +284,51 @@ public class ForexController {
         model.addAttribute("title", "Pozíció zárása");
         return "forex/zar"; // zar.html
     }
-    /*@PostMapping("/forex-zar")
-    public String forexZarSubmit(Model model) {
+    @PostMapping("/forex-zar")
+    public String forexZarResult(@RequestParam("tradeId") String tradeId, Model model) {
+        StringBuilder strOut = new StringBuilder();
 
         try {
-            // Trade lezárása
-            //var response = ctx.trade.close(Config.ACCOUNTID, tradeId);
+            // Trade zárása az OANDA API-n keresztül
+            ctx.trade.close(new TradeCloseRequest(Config.ACCOUNTID, new TradeSpecifier(tradeId)));
 
-            model.addAttribute("title", "Pozíció zárása");
-            model.addAttribute("msg", "Sikeresen lezártad a(z) " + Config.ACCOUNTID + " számú pozíciót.");
+            strOut.append("<div class='alert alert-success'>");
+            strOut.append("<h5>Pozíció sikeresen lezárva!</h5>");
+            strOut.append("<p><strong>Trade ID:</strong> ").append(tradeId).append("</p>");
+            strOut.append("<p><strong>Account ID:</strong> ").append(Config.ACCOUNTID).append("</p>");
+            strOut.append("</div>");
+
+        } catch (TradeClose404RequestException e) {
+            // Specifikus 404 hiba kezelése - nem létező Trade ID
+            strOut.append("<div class='alert alert-danger'>");
+            strOut.append("<h5>Hiba történt a pozíció zárásakor!</h5>");
+            strOut.append("<p><strong>Trade ID:</strong> ").append(tradeId).append("</p>");
+            strOut.append("<p class='text-danger'><strong>Nincs ilyen nyitott pozíció!</strong></p>");
+            strOut.append("<p>A megadott Trade ID (").append(tradeId).append(") nem található a nyitott pozíciók között.</p>");
+            strOut.append("</div>");
 
         } catch (Exception e) {
+            strOut.append("<div class='alert alert-danger'>");
+            strOut.append("<h5>Hiba történt a pozíció zárásakor!</h5>");
+            strOut.append("<p><strong>Trade ID:</strong> ").append(tradeId).append("</p>");
 
-            model.addAttribute("title", "Hiba");
-            model.addAttribute("error",
-                    "Nem sikerült lezárni a pozíciót (TradeID: " + Config.ACCOUNTID + "). Hiba: " + e.getMessage());
+            String errorMsg = e.getMessage();
+            if (errorMsg != null && errorMsg.contains("Authorization")) {
+                strOut.append("<p>Ellenőrizd, hogy az API token helyesen van-e megadva a Config.java-ban!</p>");
+            } else if (errorMsg != null && errorMsg.contains("Throwable#detailMessage")) {
+                strOut.append("<p class='text-danger'><strong>Nincs ilyen nyitott pozíció!</strong></p>");
+                strOut.append("<p>A megadott Trade ID nem található.</p>");
+            } else {
+                strOut.append("<p><strong>Hibaüzenet:</strong> ").append(errorMsg != null ? errorMsg : "Ismeretlen hiba").append("</p>");
+            }
+
+            strOut.append("</div>");
         }
 
-        return "forex/zar"; // ugyanarra az oldalra tér vissza
-    }*/
-    @PostMapping("/forex-zar")
-    public String Zaras(TradeListResponse TLR, Model model)
-    {
-        String tradeId= TLR.getTrades()+"";
-        String strOut="Closed tradeId= "+tradeId;
-        try
-        {
-            ctx.trade.close(new TradeCloseRequest(Config.ACCOUNTID, new TradeSpecifier(tradeId)));
-            model.addAttribute("title", "Pozíció zárása");
-            model.addAttribute("msg", "Sikeresen lezártad a(z) " + Config.ACCOUNTID + " számú pozíciót.");
-        } catch (Exception e)
-        {
-            model.addAttribute("title", "Hiba");
-            model.addAttribute("error",
-                    "Nem sikerült lezárni a pozíciót (TradeID: " + Config.ACCOUNTID + "). Hiba: " + e.getMessage());
-        }
-        model.addAttribute("tradeId", strOut); return "result_close_position"; }
+        model.addAttribute("title", "FOREX Zár - Eredmény");
+        model.addAttribute("result", strOut.toString());
+        return "forex/zar_result";
+    }
 
 
 

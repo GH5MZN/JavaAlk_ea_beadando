@@ -25,7 +25,7 @@ public class BankApplication {
 
     @PostMapping("/soap")
     public String soapResult(@ModelAttribute MessagePrice messagePrice, Model model) throws Exception {
-        // Validáció: end date ne legyen nagyobb, mint a mai nap
+
         java.time.LocalDate today = java.time.LocalDate.now();
         java.time.LocalDate endDate = java.time.LocalDate.parse(messagePrice.getEndDate());
 
@@ -40,7 +40,7 @@ public class BankApplication {
                                                   messagePrice.getEndDate(),
                                                   messagePrice.getCurrency());
 
-        // XML parse-olás
+
         java.util.List<String> dates = new java.util.ArrayList<>();
         java.util.List<Double> rates = new java.util.ArrayList<>();
 
