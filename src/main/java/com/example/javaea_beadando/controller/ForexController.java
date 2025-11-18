@@ -5,9 +5,16 @@ import com.example.javaea_beadando.forex.MessageActPrice;
 import com.example.javaea_beadando.forex.MessageHistPrice;
 import com.example.javaea_beadando.forex.TradeApplication;
 import com.oanda.v20.Context;
+import com.oanda.v20.order.MarketOrderRequest;
+import com.oanda.v20.order.OrderCreateRequest;
+import com.oanda.v20.order.OrderCreateResponse;
 import com.oanda.v20.pricing.ClientPrice;
 import com.oanda.v20.pricing.PricingGetRequest;
 import com.oanda.v20.pricing.PricingGetResponse;
+import com.oanda.v20.trade.Trade;
+import com.oanda.v20.trade.TradeCloseRequest;
+import com.oanda.v20.trade.TradeListResponse;
+import com.oanda.v20.trade.TradeSpecifier;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -17,6 +24,7 @@ import com.oanda.v20.instrument.Candlestick;
 import com.oanda.v20.instrument.InstrumentCandlesRequest;
 import com.oanda.v20.instrument.InstrumentCandlesResponse;
 import com.oanda.v20.primitives.InstrumentName;
+import org.springframework.web.bind.annotation.RequestParam;
 
 
 import java.util.ArrayList;
@@ -128,73 +136,118 @@ public class ForexController {
         return "forex/histar";
     }
 
-    @PostMapping("/forex-histar")
-    public String forexHistarResult(@ModelAttribute MessageHistPrice messageHistPrice, Model model) {
+    @PostMapping("/forex-nyit")
+    public String forexNyitResult(
+            @ModelAttribute("instrument") String instrument,
+            @ModelAttribute("units") int units,
+            Model model
+    ) {
         StringBuilder strOut = new StringBuilder();
 
         try {
-            InstrumentCandlesRequest request = new InstrumentCandlesRequest(new
-                    InstrumentName(messageHistPrice.getInstrument()));
+            // Market order létrehozása OANDA-n
+            OrderCreateRequest orderReq = new OrderCreateRequest(Config.ACCOUNTID);
 
-            switch (messageHistPrice.getGranularity()) {
-                case "M1": request.setGranularity(M1); break;
-                case "H1": request.setGranularity(H1); break;
-                case "D": request.setGranularity(D); break;
-                case "W": request.setGranularity(W); break;
-                case "M": request.setGranularity(M); break;
-            }
+            MarketOrderRequest marketOrder = new MarketOrderRequest();
+            marketOrder.setInstrument(instrument);
+            marketOrder.setUnits(String.valueOf(units)); // Long = pozitív, Short = negatív
 
-            request.setCount(Long.valueOf(10)); // utolsó 10 árat kérjünk
-            InstrumentCandlesResponse resp = ctx.instrument.candles(request);
+            orderReq.setOrder(marketOrder);
 
-            strOut.append("<table class='table table-bordered table-striped'>");
-            strOut.append("<thead class='thead-dark'>");
-            strOut.append("<tr><th>#</th><th>Time</th><th>Open</th><th>High</th><th>Low</th><th>Close</th></tr>");
-            strOut.append("</thead><tbody>");
+            // Order elküldése
+            OrderCreateResponse resp = ctx.order.create(orderReq);
 
-            int count = 1;
-            for (Candlestick candle : resp.getCandles()) {
-                strOut.append("<tr>");
-                strOut.append("<td>").append(count++).append("</td>");
-                strOut.append("<td>").append(candle.getTime()).append("</td>");
-                strOut.append("<td>").append(candle.getMid().getO()).append("</td>");
-                strOut.append("<td class='text-success'>").append(candle.getMid().getH()).append("</td>");
-                strOut.append("<td class='text-danger'>").append(candle.getMid().getL()).append("</td>");
-                strOut.append("<td><strong>").append(candle.getMid().getC()).append("</strong></td>");
-                strOut.append("</tr>");
-            }
-            strOut.append("</tbody></table>");
+            strOut.append("<div class='alert alert-success'>");
+            strOut.append("<h5>Pozíció megnyitva!</h5>");
+            strOut.append("<p><strong>Instrument:</strong> ").append(instrument).append("</p>");
+            strOut.append("<p><strong>Mennyiség:</strong> ").append(units).append("</p>");
+            strOut.append("<p><strong>Order ID:</strong> ").append(resp.getOrderCreateTransaction().getId()).append("</p>");
+            strOut.append("</div>");
 
         } catch (Exception e) {
             strOut.append("<div class='alert alert-danger'>");
-            strOut.append("<h5><i class='fas fa-exclamation-circle'></i> Hiba történt</h5>");
+            strOut.append("<h5>Hiba történt a pozíció nyitásakor!</h5>");
             strOut.append("<p><strong>Hibaüzenet:</strong> ").append(e.getMessage()).append("</p>");
+
+            if (e.getMessage() != null && e.getMessage().contains("Authorization")) {
+                strOut.append("<p>Ellenőrizd, hogy az API token helyesen van-e megadva a Config.java-ban!</p>");
+            }
+
             strOut.append("</div>");
         }
 
-        model.addAttribute("title", "FOREX HistÁr - Eredmény");
-        model.addAttribute("instr", messageHistPrice.getInstrument());
-        model.addAttribute("granularity", messageHistPrice.getGranularity());
-        model.addAttribute("price", strOut.toString());
-        return "forex/histar_result";
-    }
+        model.addAttribute("title", "FOREX Nyit - Eredmény");
+        model.addAttribute("result", strOut.toString());
 
+        return "forex/nyit_result";
+    }
     @GetMapping("/forex-nyit")
-    public String forexNyit(Model model) {
-        model.addAttribute("title", "FOREX Nyit");
-        return "forex/nyit";
+    public String forexNyitPage(Model model) {
+        model.addAttribute("title", "FOREX Nyitás");
+        return "forex/nyit"; // nyit.html
     }
 
     @GetMapping("/forex-poz")
-    public String forexPoz(Model model) {
-        model.addAttribute("title", "FOREX Poz");
-        return "forex/poz";
-    }
+    public String forexPozok(Model model) {
 
-    @GetMapping("/forex-zar")
-    public String forexZar(Model model) {
-        model.addAttribute("title", "FOREX Zár");
-        return "forex/zar";
+        try {
+
+            TradeListResponse response = ctx.trade.list(Config.ACCOUNTID);
+            List<Trade> trades = response.getTrades();
+
+            model.addAttribute("title", "Nyitott pozíciók");
+            model.addAttribute("trades", trades);
+
+        } catch (Exception e) {
+            model.addAttribute("title", "Hiba");
+            model.addAttribute("error", "Nem sikerült lekérni a nyitott pozíciókat: " + e.getMessage());
+        }
+
+        return "forex/poz"; // poz.html
     }
+    @GetMapping("/forex-zar")
+    public String forexZarPage(Model model) {
+        model.addAttribute("title", "Pozíció zárása");
+        return "forex/zar"; // zar.html
+    }
+    /*@PostMapping("/forex-zar")
+    public String forexZarSubmit(Model model) {
+
+        try {
+            // Trade lezárása
+            //var response = ctx.trade.close(Config.ACCOUNTID, tradeId);
+
+            model.addAttribute("title", "Pozíció zárása");
+            model.addAttribute("msg", "Sikeresen lezártad a(z) " + Config.ACCOUNTID + " számú pozíciót.");
+
+        } catch (Exception e) {
+
+            model.addAttribute("title", "Hiba");
+            model.addAttribute("error",
+                    "Nem sikerült lezárni a pozíciót (TradeID: " + Config.ACCOUNTID + "). Hiba: " + e.getMessage());
+        }
+
+        return "forex/zar"; // ugyanarra az oldalra tér vissza
+    }*/
+    @PostMapping("/forex-zar")
+    public String Zaras(TradeListResponse TLR, Model model)
+    {
+        String tradeId= TLR.getTrades()+"";
+        String strOut="Closed tradeId= "+tradeId;
+        try
+        {
+            ctx.trade.close(new TradeCloseRequest(Config.ACCOUNTID, new TradeSpecifier(tradeId)));
+            model.addAttribute("title", "Pozíció zárása");
+            model.addAttribute("msg", "Sikeresen lezártad a(z) " + Config.ACCOUNTID + " számú pozíciót.");
+        } catch (Exception e)
+        {
+            model.addAttribute("title", "Hiba");
+            model.addAttribute("error",
+                    "Nem sikerült lezárni a pozíciót (TradeID: " + Config.ACCOUNTID + "). Hiba: " + e.getMessage());
+        }
+        model.addAttribute("tradeId", strOut); return "result_close_position"; }
+
+
+
 }
 

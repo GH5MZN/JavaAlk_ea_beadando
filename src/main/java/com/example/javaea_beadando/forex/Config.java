@@ -5,6 +5,8 @@ import com.oanda.v20.ContextBuilder;
 import com.oanda.v20.account.AccountID;
 
 public class Config {
+
+
     private Config() {
     }
 

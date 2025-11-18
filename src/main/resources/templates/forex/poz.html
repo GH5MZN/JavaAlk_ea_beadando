@@ -21,7 +21,33 @@
                         <h6 class="m-0 font-weight-bold text-primary">Nyitott pozíciók</h6>
                     </div>
                     <div class="card-body">
-                        <p>Itt láthatod a nyitott pozíciókat.</p>
+
+                        <h2>Nyitott pozíciók</h2>
+
+                        <div th:if="${error}">
+                            <p style="color: red;" th:text="${error}"></p>
+                        </div>
+
+                        <table border="1" cellpadding="6" cellspacing="0" th:if="${trades}">
+                            <tr>
+                                <th>Trade ID</th>
+                                <th>Instrument</th>
+                                <th>Mennyiség</th>
+                                <th>Nyitási ár</th>
+                                <th>Jelenlegi ár</th>
+                            </tr>
+
+                            <tr th:each="t : ${trades}">
+                                <td th:text="${t.id}"></td>
+                                <td th:text="${t.instrument}"></td>
+                                <td th:text="${t.currentUnits}"></td>
+                                <td th:text="${t.price}"></td>
+                                <td th:text="${t.unrealizedPL}"></td>
+                            </tr>
+
+
+                        </table>
+
                     </div>
                 </div>
             </div>

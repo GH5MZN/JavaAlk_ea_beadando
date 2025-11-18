@@ -248,8 +248,7 @@ public class TradeContext {
      */
     public TradeSetDependentOrdersResponse setDependentOrders(TradeSetDependentOrdersRequest request)
         throws TradeSetDependentOrders400RequestException, RequestException,
-            ExecuteException
-    {
+            ExecuteException {
         if (setDependentOrdersResponseMap == null) {
             setDependentOrdersResponseMap = new HashMap<>();
             setDependentOrdersResponseMap.put(200, TradeSetDependentOrdersResponse.class);
@@ -257,10 +256,10 @@ public class TradeContext {
         }
 
         return (TradeSetDependentOrdersResponse) ctx.execute(
-            "PUT",
-            "/v3/accounts/{accountID}/trades/{tradeSpecifier}/orders",
-            request,
-            setDependentOrdersResponseMap
+                "PUT",
+                "/v3/accounts/{accountID}/trades/{tradeSpecifier}/orders",
+                request,
+                setDependentOrdersResponseMap
         );
     }
 }
