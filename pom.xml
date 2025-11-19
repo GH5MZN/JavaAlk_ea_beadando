@@ -83,6 +83,13 @@
                     </sourceDestDir>
                 </configuration>
             </plugin>
+            <plugin>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-maven-plugin</artifactId>
+                <configuration>
+                    <mainClass>com.example.javaea_beadando.JavaEaBeadandoApplication</mainClass>
+                </configuration>
+            </plugin>
         </plugins>
     </build>
 

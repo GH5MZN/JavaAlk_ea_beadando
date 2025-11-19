@@ -38,6 +38,12 @@ public class ForexController {
 
     private final Context ctx = Config.getContext();
 
+    @GetMapping("/")
+    public String index(Model model) {
+        model.addAttribute("title", "Főoldal - FOREX Trading Platform");
+        return "index";
+    }
+
     @GetMapping("/forex-account")
     public String forexAccount(Model model) {
         try {
@@ -61,9 +67,6 @@ public class ForexController {
             model.addAttribute("tradeApp", tradeApp);
 
         } catch (Exception e) {
-            System.out.println("ERROR: Account adatok lekérése sikertelen: " + e.getMessage());
-            e.printStackTrace();
-
             // Fallback - statikus adatok hiba esetén
             TradeApplication tradeApp = new TradeApplication();
             tradeApp.setAccountId(Config.ACCOUNTID.toString());
@@ -104,8 +107,8 @@ public class ForexController {
 
             if (resp.getPrices().isEmpty()) {
                 strOut.append("<p class='text-warning'>Nem található árfolyam adat a következő instrumenthez: ")
-                      .append(messageActPrice.getInstrument())
-                      .append("</p>");
+                        .append(messageActPrice.getInstrument())
+                        .append("</p>");
             } else {
                 strOut.append("<table class='table table-bordered table-striped'>");
                 strOut.append("<thead class='thead-dark'>");
@@ -165,68 +168,56 @@ public class ForexController {
     }
 
     @PostMapping("/forex-histar")
-    public String forexHistarResult(@ModelAttribute MessageHistPrice messageHistPrice, Model model) {
-        StringBuilder strOut = new StringBuilder();
-        List<String> labels = new ArrayList<>();
-        List<Double> closeData = new ArrayList<>();
-        List<Double> highData = new ArrayList<>();
-        List<Double> lowData = new ArrayList<>();
+    public String forexHistarResult(@ModelAttribute("par") MessageHistPrice messageHistPrice, Model model) {
+        String strOut = "";
+        String instrument = messageHistPrice.getInstrument();
+        String granularity = messageHistPrice.getGranularity();
 
         try {
-            InstrumentCandlesRequest request = new InstrumentCandlesRequest(
-                    new InstrumentName(messageHistPrice.getInstrument()));
-            request.setGranularity(valueOf(messageHistPrice.getGranularity()));
-            request.setCount(10L);
+            InstrumentCandlesRequest request = new InstrumentCandlesRequest(new InstrumentName(instrument));
 
-            InstrumentCandlesResponse resp = ctx.instrument.candles(request);
-            List<Candlestick> candles = resp.getCandles();
-
-            if (candles.isEmpty()) {
-                strOut.append("<p class='text-warning'>Nincs elérhető historikus adat.</p>");
+            if ("M1".equals(granularity)) {
+                request.setGranularity(M1);
+            } else if ("H1".equals(granularity)) {
+                request.setGranularity(H1);
+            } else if ("D".equals(granularity)) {
+                request.setGranularity(D);
+            } else if ("W".equals(granularity)) {
+                request.setGranularity(W);
+            } else if ("M".equals(granularity)) {
+                request.setGranularity(M);
             } else {
-                strOut.append("<table class='table table-bordered table-striped'>");
-                strOut.append("<thead class='thead-dark'>");
-                strOut.append("<tr><th>Időpont</th><th>Open</th><th>High</th><th>Low</th><th>Close</th><th>Volume</th></tr>");
-                strOut.append("</thead><tbody>");
-
-                for (Candlestick candle : candles) {
-                    labels.add(candle.getTime().toString());
-                    closeData.add(Double.parseDouble(candle.getMid().getC().toString()));
-                    highData.add(Double.parseDouble(candle.getMid().getH().toString()));
-                    lowData.add(Double.parseDouble(candle.getMid().getL().toString()));
-
-                    strOut.append("<tr>");
-                    strOut.append("<td>").append(candle.getTime()).append("</td>");
-                    strOut.append("<td>").append(candle.getMid().getO()).append("</td>");
-                    strOut.append("<td class='text-success'>").append(candle.getMid().getH()).append("</td>");
-                    strOut.append("<td class='text-danger'>").append(candle.getMid().getL()).append("</td>");
-                    strOut.append("<td><strong>").append(candle.getMid().getC()).append("</strong></td>");
-                    strOut.append("<td>").append(candle.getVolume()).append("</td>");
-                    strOut.append("</tr>");
-                }
-                strOut.append("</tbody></table>");
+                request.setGranularity(H1);
             }
+
+            request.setCount(10L);
+            InstrumentCandlesResponse resp = ctx.instrument.candles(request);
+
+            strOut = "<table class='table table-bordered table-striped'>";
+            strOut += "<thead class='thead-dark'>";
+            strOut += "<tr><th>Időpont</th><th>Open</th><th>High</th><th>Low</th><th>Close</th><th>Volume</th></tr>";
+            strOut += "</thead><tbody>";
+
+            for (Candlestick candle : resp.getCandles()) {
+                strOut += "<tr>";
+                strOut += "<td>" + candle.getTime() + "</td>";
+                strOut += "<td>" + candle.getMid().getO() + "</td>";
+                strOut += "<td class='text-success'>" + candle.getMid().getH() + "</td>";
+                strOut += "<td class='text-danger'>" + candle.getMid().getL() + "</td>";
+                strOut += "<td><strong>" + candle.getMid().getC() + "</strong></td>";
+                strOut += "<td>" + (candle.getVolume() != null ? candle.getVolume() : "N/A") + "</td>";
+                strOut += "</tr>";
+            }
+            strOut += "</tbody></table>";
 
         } catch (Exception e) {
-            strOut.append("<div class='alert alert-danger'>");
-            strOut.append("<h5><i class='fas fa-exclamation-circle'></i> Hiba történt</h5>");
-            strOut.append("<p><strong>Hibaüzenet:</strong> ").append(e.getMessage()).append("</p>");
-
-            if (e.getMessage() != null && e.getMessage().contains("Authorization")) {
-                strOut.append("<p>Ellenőrizd, hogy az API token helyes-e a Config.java fájlban!</p>");
-            }
-
-            strOut.append("</div>");
+            strOut = "<div class='alert alert-danger'>Hiba: " + e.getMessage() + "</div>";
         }
 
         model.addAttribute("title", "FOREX HistÁr - Eredmény");
-        model.addAttribute("instrument", messageHistPrice.getInstrument());
-        model.addAttribute("granularity", messageHistPrice.getGranularity());
-        model.addAttribute("data", strOut.toString());
-        model.addAttribute("labels", labels);
-        model.addAttribute("closeData", closeData);
-        model.addAttribute("highData", highData);
-        model.addAttribute("lowData", lowData);
+        model.addAttribute("instr", instrument);
+        model.addAttribute("granularity", granularity);
+        model.addAttribute("price", strOut);
 
         return "forex/histar_result";
     }
@@ -293,12 +284,9 @@ public class ForexController {
     @GetMapping("/forex-poz")
     public String forexPozok(Model model) {
         try {
-            System.out.println("DEBUG: /forex-poz hívva");
-
             TradeListResponse response = ctx.trade.list(Config.ACCOUNTID);
 
             if (response == null) {
-                System.out.println("DEBUG: response null!");
                 model.addAttribute("title", "Nyitott pozíciók");
                 model.addAttribute("trades", new ArrayList<>());
                 return "forex/poz";
@@ -307,29 +295,19 @@ public class ForexController {
             List<Trade> trades = response.getTrades();
 
             if (trades == null) {
-                System.out.println("DEBUG: trades null!");
                 trades = new ArrayList<>();
-            }
-
-            System.out.println("DEBUG: Lekérdezvényi Trades szama: " + trades.size());
-            if (trades != null && !trades.isEmpty()) {
-                for (Trade t : trades) {
-                    System.out.println("DEBUG: Trade ID: " + t.getId() + ", Instrument: " + t.getInstrument() + ", Units: " + t.getCurrentUnits());
-                }
             }
 
             model.addAttribute("title", "Nyitott pozíciók");
             model.addAttribute("trades", trades);
 
         } catch (Exception e) {
-            System.out.println("ERROR: Hiba a /forex-poz-nál: " + e.getMessage());
-            e.printStackTrace();
             model.addAttribute("title", "Nyitott pozíciók");
             model.addAttribute("trades", new ArrayList<>());
             model.addAttribute("error", "Hiba az adatok lekérésekor: " + e.getMessage());
         }
 
-        return "forex/poz"; // poz.html
+        return "forex/poz";
     }
     @GetMapping("/forex-zar")
     public String forexZarPage(Model model) {
@@ -389,4 +367,3 @@ public class ForexController {
 
 
 }
-
