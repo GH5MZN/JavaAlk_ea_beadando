@@ -22,23 +22,22 @@
                         <h6 class="m-0 font-weight-bold text-primary">Pozíció zárása</h6>
                     </div>
                     <div class="card-body">
-                        <div th:if="${msg}">
-                            <p style="color: green;" th:text="${msg}"></p>
-                        </div>
-
-                        <div th:if="${error}">
-                            <p style="color: red;" th:text="${error}"></p>
-                        </div>
-
                         <form method="post" action="/forex-zar">
+                            <div class="form-group">
+                                <label for="tradeId">Trade ID:</label>
+                                <input type="text" id="tradeId" name="tradeId" class="form-control" placeholder="Pl: 50, 123, 456..." required>
+                                <small class="form-text text-muted">
+                                    Add meg annak a pozíciónak a Trade ID-ját, amelyet le szeretnél zárni.
+                                    A Trade ID-kat a <a href="/forex-poz">Nyitott pozíciók</a> oldalon találod.
+                                </small>
+                            </div>
 
-                            <label>Trade ID:</label>
-                            <input type="number" name="tradeId" required>
-
-                            <br><br>
-
-                            <button type="submit">Pozíció zárása</button>
-
+                            <button type="submit" class="btn btn-danger">
+                                <i class="fas fa-lock"></i> Pozíció zárása
+                            </button>
+                            <a href="/forex-poz" class="btn btn-secondary ml-2">
+                                <i class="fas fa-arrow-left"></i> Vissza a pozíciókhoz
+                            </a>
                         </form>
                     </div>
                 </div>

@@ -263,18 +263,41 @@ public class ForexController {
 
     @GetMapping("/forex-poz")
     public String forexPozok(Model model) {
-
         try {
+            System.out.println("DEBUG: /forex-poz hívva");
 
             TradeListResponse response = ctx.trade.list(Config.ACCOUNTID);
+
+            if (response == null) {
+                System.out.println("DEBUG: response null!");
+                model.addAttribute("title", "Nyitott pozíciók");
+                model.addAttribute("trades", new ArrayList<>());
+                return "forex/poz";
+            }
+
             List<Trade> trades = response.getTrades();
+
+            if (trades == null) {
+                System.out.println("DEBUG: trades null!");
+                trades = new ArrayList<>();
+            }
+
+            System.out.println("DEBUG: Lekérdezvényi Trades szama: " + trades.size());
+            if (trades != null && !trades.isEmpty()) {
+                for (Trade t : trades) {
+                    System.out.println("DEBUG: Trade ID: " + t.getId() + ", Instrument: " + t.getInstrument() + ", Units: " + t.getCurrentUnits());
+                }
+            }
 
             model.addAttribute("title", "Nyitott pozíciók");
             model.addAttribute("trades", trades);
 
         } catch (Exception e) {
-            model.addAttribute("title", "Hiba");
-            model.addAttribute("error", "Nem sikerült lekérni a nyitott pozíciókat: " + e.getMessage());
+            System.out.println("ERROR: Hiba a /forex-poz-nál: " + e.getMessage());
+            e.printStackTrace();
+            model.addAttribute("title", "Nyitott pozíciók");
+            model.addAttribute("trades", new ArrayList<>());
+            model.addAttribute("error", "Hiba az adatok lekérésekor: " + e.getMessage());
         }
 
         return "forex/poz"; // poz.html

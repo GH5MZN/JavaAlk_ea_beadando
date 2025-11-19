@@ -23,25 +23,32 @@
                     <div class="card-body">
 
                         <form method="post" action="/forex-nyit">
+                            <div class="form-group">
+                                <label for="instrument">Instrumentum:</label>
+                                <select id="instrument" name="instrument" class="form-control" required>
+                                    <option value="">-- Válassz instrumentumot --</option>
+                                    <option value="EUR_USD">EUR/USD</option>
+                                    <option value="GBP_USD">GBP/USD</option>
+                                    <option value="USD_JPY">USD/JPY</option>
+                                    <option value="AUD_USD">AUD/USD</option>
+                                    <option value="USD_CAD">USD/CAD</option>
+                                    <option value="USD_CHF">USD/CHF</option>
+                                </select>
+                                <small class="form-text text-muted">Válaszd ki a kereskedni kívánt devizapárt</small>
+                            </div>
 
-                            <label for="instrument">Instrumentum:</label>
-                            <select id="instrument" name="instrument" required>
-                                <option value="EUR_USD">EUR/USD</option>
-                                <option value="GBP_USD">GBP/USD</option>
-                                <option value="USD_JPY">USD/JPY</option>
-                                <option value="AUD_USD">AUD/USD</option>
-                                <option value="USD_CAD">USD/CAD</option>
-                                <option value="USD_CHF">USD/CHF</option>
-                            </select>
+                            <div class="form-group">
+                                <label for="units">Mennyiség:</label>
+                                <input type="number" id="units" name="units" class="form-control" placeholder="Pl: 1000 (long) vagy -1000 (short)" required>
+                                <small class="form-text text-muted">
+                                    <strong>Pozitív szám:</strong> Long pozíció (felfelé számítasz)<br>
+                                    <strong>Negatív szám:</strong> Short pozíció (lefelé számítasz)
+                                </small>
+                            </div>
 
-                            <br><br>
-
-                            <label for="units">Mennyiség (pozitív: Long, negatív: Short):</label>
-                            <input type="number" id="units" name="units" required>
-
-                            <br><br>
-
-                            <button type="submit">Pozíció megnyitása</button>
+                            <button type="submit" class="btn btn-primary">
+                                <i class="fas fa-plus"></i> Pozíció megnyitása
+                            </button>
                         </form>
                     </div>
                 </div>
