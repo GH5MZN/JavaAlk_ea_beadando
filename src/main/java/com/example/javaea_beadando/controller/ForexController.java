@@ -40,20 +40,47 @@ public class ForexController {
 
     @GetMapping("/forex-account")
     public String forexAccount(Model model) {
-        // Példa TradeApplication adat létrehozása
-        TradeApplication tradeApp = new TradeApplication();
-        tradeApp.setAccountId("101-004-1234567-001");
-        tradeApp.setAccountName("Primary Trading Account");
-        tradeApp.setCurrency("USD");
-        tradeApp.setBalance(10000.00);
-        tradeApp.setUnrealizedPL(250.50);
-        tradeApp.setMarginUsed(2500.00);
-        tradeApp.setMarginAvailable(7500.00);
-        tradeApp.setOpenTradeCount(5);
-        tradeApp.setOpenPositionCount(3);
+        try {
+            // Valódi account adatok lekérése az OANDA API-ból
+            com.oanda.v20.account.AccountGetResponse accountResp = ctx.account.get(Config.ACCOUNTID);
+            com.oanda.v20.account.Account account = accountResp.getAccount();
 
-        model.addAttribute("title", "FOREX Account");
-        model.addAttribute("tradeApp", tradeApp);
+            // TradeApplication objektum feltöltése valódi adatokkal
+            TradeApplication tradeApp = new TradeApplication();
+            tradeApp.setAccountId(account.getId().toString());
+            tradeApp.setAccountName("OANDA Trading Account");
+            tradeApp.setCurrency(account.getCurrency().toString());
+            tradeApp.setBalance(Double.parseDouble(account.getBalance().toString()));
+            tradeApp.setUnrealizedPL(Double.parseDouble(account.getUnrealizedPL().toString()));
+            tradeApp.setMarginUsed(Double.parseDouble(account.getMarginUsed().toString()));
+            tradeApp.setMarginAvailable(Double.parseDouble(account.getMarginAvailable().toString()));
+            tradeApp.setOpenTradeCount(account.getOpenTradeCount().intValue());
+            tradeApp.setOpenPositionCount(account.getOpenPositionCount().intValue());
+
+            model.addAttribute("title", "FOREX Account");
+            model.addAttribute("tradeApp", tradeApp);
+
+        } catch (Exception e) {
+            System.out.println("ERROR: Account adatok lekérése sikertelen: " + e.getMessage());
+            e.printStackTrace();
+
+            // Fallback - statikus adatok hiba esetén
+            TradeApplication tradeApp = new TradeApplication();
+            tradeApp.setAccountId(Config.ACCOUNTID.toString());
+            tradeApp.setAccountName("OANDA Trading Account (Hiba)");
+            tradeApp.setCurrency("USD");
+            tradeApp.setBalance(0.00);
+            tradeApp.setUnrealizedPL(0.00);
+            tradeApp.setMarginUsed(0.00);
+            tradeApp.setMarginAvailable(0.00);
+            tradeApp.setOpenTradeCount(0);
+            tradeApp.setOpenPositionCount(0);
+
+            model.addAttribute("title", "FOREX Account");
+            model.addAttribute("tradeApp", tradeApp);
+            model.addAttribute("error", "Hiba az account adatok lekérésekor: " + e.getMessage());
+        }
+
         return "forex/account";
     }
 
@@ -238,6 +265,9 @@ public class ForexController {
 
             strOut.append("</div>");
 
+            // Sikeres nyitás után redirect az account oldalra
+            return "redirect:/forex-account";
+
         } catch (Exception e) {
             strOut.append("<div class='alert alert-danger'>");
             strOut.append("<h5>Hiba történt a pozíció nyitásakor!</h5>");
@@ -248,12 +278,11 @@ public class ForexController {
             }
 
             strOut.append("</div>");
+
+            model.addAttribute("title", "FOREX Nyit - Eredmény");
+            model.addAttribute("result", strOut.toString());
+            return "forex/nyit_result";
         }
-
-        model.addAttribute("title", "FOREX Nyit - Eredmény");
-        model.addAttribute("result", strOut.toString());
-
-        return "forex/nyit_result";
     }
     @GetMapping("/forex-nyit")
     public String forexNyitPage(Model model) {
@@ -321,6 +350,9 @@ public class ForexController {
             strOut.append("<p><strong>Account ID:</strong> ").append(Config.ACCOUNTID).append("</p>");
             strOut.append("</div>");
 
+            // Sikeres zárás után redirect az account oldalra
+            return "redirect:/forex-account";
+
         } catch (TradeClose404RequestException e) {
             // Specifikus 404 hiba kezelése - nem létező Trade ID
             strOut.append("<div class='alert alert-danger'>");
@@ -346,10 +378,11 @@ public class ForexController {
             }
 
             strOut.append("</div>");
-        }
 
-        model.addAttribute("title", "FOREX Zár - Eredmény");
-        model.addAttribute("result", strOut.toString());
+            model.addAttribute("title", "FOREX Zár - Eredmény");
+            model.addAttribute("result", strOut.toString());
+
+        }
         return "forex/zar_result";
     }
 
