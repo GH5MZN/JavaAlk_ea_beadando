@@ -28,8 +28,13 @@ import com.oanda.v20.primitives.InstrumentName;
 import org.springframework.web.bind.annotation.RequestParam;
 
 
+import java.time.format.DateTimeFormatter;
+import java.time.Instant;
+import java.time.ZoneId;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import static com.oanda.v20.instrument.CandlestickGranularity.*;
 
@@ -169,55 +174,80 @@ public class ForexController {
 
     @PostMapping("/forex-histar")
     public String forexHistarResult(@ModelAttribute("par") MessageHistPrice messageHistPrice, Model model) {
-        String strOut = "";
+        StringBuilder strOut = new StringBuilder();
         String instrument = messageHistPrice.getInstrument();
         String granularity = messageHistPrice.getGranularity();
+
+        List<String> labels = new ArrayList<>();
+        List<Double> dataClose = new ArrayList<>();
+        List<Double> dataHigh = new ArrayList<>();
+        List<Double> dataLow = new ArrayList<>();
 
         try {
             InstrumentCandlesRequest request = new InstrumentCandlesRequest(new InstrumentName(instrument));
 
-            if ("M1".equals(granularity)) {
-                request.setGranularity(M1);
-            } else if ("H1".equals(granularity)) {
-                request.setGranularity(H1);
-            } else if ("D".equals(granularity)) {
-                request.setGranularity(D);
-            } else if ("W".equals(granularity)) {
-                request.setGranularity(W);
-            } else if ("M".equals(granularity)) {
-                request.setGranularity(M);
-            } else {
-                request.setGranularity(H1);
+            switch (granularity) {
+                case "M1":
+                    request.setGranularity(M1);
+                    break;
+                case "H1":
+                    request.setGranularity(H1);
+                    break;
+                case "D":
+                    request.setGranularity(D);
+                    break;
+                case "W":
+                    request.setGranularity(W);
+                    break;
+                case "M":
+                    request.setGranularity(M);
+                    break;
+                default:
+                    request.setGranularity(H1);
+                    break;
             }
 
             request.setCount(10L);
             InstrumentCandlesResponse resp = ctx.instrument.candles(request);
+            List<Candlestick> candles = resp.getCandles();
 
-            strOut = "<table class='table table-bordered table-striped'>";
-            strOut += "<thead class='thead-dark'>";
-            strOut += "<tr><th>Időpont</th><th>Open</th><th>High</th><th>Low</th><th>Close</th><th>Volume</th></tr>";
-            strOut += "</thead><tbody>";
+            strOut.append("<table class='table table-bordered table-striped'>");
+            strOut.append("<thead class='thead-dark'>");
+            strOut.append("<tr><th>Időpont</th><th>Open</th><th>High</th><th>Low</th><th>Close</th><th>Volume</th></tr>");
+            strOut.append("</thead><tbody>");
 
-            for (Candlestick candle : resp.getCandles()) {
-                strOut += "<tr>";
-                strOut += "<td>" + candle.getTime() + "</td>";
-                strOut += "<td>" + candle.getMid().getO() + "</td>";
-                strOut += "<td class='text-success'>" + candle.getMid().getH() + "</td>";
-                strOut += "<td class='text-danger'>" + candle.getMid().getL() + "</td>";
-                strOut += "<td><strong>" + candle.getMid().getC() + "</strong></td>";
-                strOut += "<td>" + (candle.getVolume() != null ? candle.getVolume() : "N/A") + "</td>";
-                strOut += "</tr>";
+            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm").withZone(ZoneId.systemDefault());
+
+            for (Candlestick candle : candles) {
+                strOut.append("<tr>");
+                strOut.append("<td>").append(candle.getTime()).append("</td>");
+                strOut.append("<td>").append(candle.getMid().getO()).append("</td>");
+                strOut.append("<td class='text-success'>").append(candle.getMid().getH()).append("</td>");
+                strOut.append("<td class='text-danger'>").append(candle.getMid().getL()).append("</td>");
+                strOut.append("<td><strong>").append(candle.getMid().getC()).append("</strong></td>");
+                strOut.append("<td>").append(candle.getVolume() != null ? candle.getVolume() : "N/A").append("</td>");
+                strOut.append("</tr>");
+
+                labels.add(formatter.format(Instant.parse(candle.getTime())));
+                dataClose.add(Double.valueOf(candle.getMid().getC().toString()));
+                dataHigh.add(Double.valueOf(candle.getMid().getH().toString()));
+                dataLow.add(Double.valueOf(candle.getMid().getL().toString()));
             }
-            strOut += "</tbody></table>";
+            strOut.append("</tbody></table>");
 
         } catch (Exception e) {
-            strOut = "<div class='alert alert-danger'>Hiba: " + e.getMessage() + "</div>";
+            strOut.append("<div class='alert alert-danger'>Hiba: ").append(e.getMessage()).append("</div>");
         }
 
         model.addAttribute("title", "FOREX HistÁr - Eredmény");
         model.addAttribute("instr", instrument);
         model.addAttribute("granularity", granularity);
-        model.addAttribute("price", strOut);
+        model.addAttribute("price", strOut.toString());
+
+        model.addAttribute("labels", labels);
+        model.addAttribute("dataClose", dataClose);
+        model.addAttribute("dataHigh", dataHigh);
+        model.addAttribute("dataLow", dataLow);
 
         return "forex/histar_result";
     }
@@ -363,7 +393,5 @@ public class ForexController {
         }
         return "forex/zar_result";
     }
-
-
 
 }

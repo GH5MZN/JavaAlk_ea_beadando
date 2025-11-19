@@ -24,8 +24,9 @@
                         </h6>
                     </div>
                     <div class="card-body">
+                    
                         <!-- Historikus adatok -->
-                        <div th:utext="${price}"></div>
+                        <div class="mt-4" th:utext="${price}"></div>
 
                         <div class="mt-4">
                             <a href="/forex-histar?clear=true" class="btn btn-primary">
@@ -46,69 +47,3 @@
         </footer>
     </div>
 </div>
-
-<script th:inline="javascript">
-    /*<![CDATA[*/
-    const ctx = document.getElementById('myChart');
-
-    const labels = [/*[[${labels}]]*/];
-    const dataClose = [/*[[${dataClose}]]*/];
-    const dataHigh = [/*[[${dataHigh}]]*/];
-    const dataLow = [/*[[${dataLow}]]*/];
-
-    new Chart(ctx, {
-        type: 'line',
-        data: {
-            labels: labels,
-            datasets: [
-                {
-                    label: 'Záró árfolyam (Close)',
-                    data: dataClose,
-                    borderColor: 'rgb(75, 192, 192)',
-                    backgroundColor: 'rgba(75, 192, 192, 0.2)',
-                    tension: 0.1
-                },
-                {
-                    label: 'Legmagasabb (High)',
-                    data: dataHigh,
-                    borderColor: 'rgb(54, 162, 235)',
-                    backgroundColor: 'rgba(54, 162, 235, 0.2)',
-                    tension: 0.1
-                },
-                {
-                    label: 'Legalacsonyabb (Low)',
-                    data: dataLow,
-                    borderColor: 'rgb(255, 99, 132)',
-                    backgroundColor: 'rgba(255, 99, 132, 0.2)',
-                    tension: 0.1
-                }
-            ]
-        },
-        options: {
-            responsive: true,
-            plugins: {
-                legend: {
-                    position: 'top',
-                },
-                title: {
-                    display: true,
-                    text: 'Historikus árfolyam változás'
-                }
-            },
-            scales: {
-                y: {
-                    beginAtZero: false
-                }
-            }
-        }
-    });
-    /*]]>*/
-</script>
-
-<script th:src="@{/vendor/jquery/jquery.min.js}"></script>
-<script th:src="@{/vendor/bootstrap/js/bootstrap.bundle.min.js}"></script>
-<script th:src="@{/vendor/jquery-easing/jquery.easing.min.js}"></script>
-<script th:src="@{/js/sb-admin-2.min.js}"></script>
-</body>
-</html>
-
